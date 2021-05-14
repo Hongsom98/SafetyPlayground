@@ -1,5 +1,5 @@
 from tkinter import *
-
+import webbrowser
 class MainGui:
     def __init__(self):
         self.MainWnd = Tk()
@@ -63,7 +63,9 @@ class MainGui:
         pass
 
     def Button_Namuwiki_Link(self):
-        pass
+        url = "https://namu.wiki/w/%EA%B2%BD%EB%A7%88"
+        webbrowser.open(url)
+
 
     def TurnToSearchScene(self):
         pass
