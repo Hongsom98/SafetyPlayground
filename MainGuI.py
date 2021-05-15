@@ -1,5 +1,11 @@
 from tkinter import *
 import webbrowser
+import XmlProcess
+
+
+def Button_Namuwiki_Link():
+    webbrowser.open("https://namu.wiki/w/%EA%B2%BD%EB%A7%88")
+
 class MainGui:
     def __init__(self):
         self.MainWnd = Tk()
@@ -7,71 +13,75 @@ class MainGui:
         self.MainWnd.geometry("480x680+660+240")
         self.MainWnd.resizable(False, False)
 
-        self.Button_Seoul    = Button(self.MainWnd, text='서울', width=10, height=5, command=self.Button_Seoul_Input)
-        self.Button_Bugyoung = Button(self.MainWnd, text='부경', width=10, height=5, command=self.Button_Bugyoung_Input)
-        self.Button_Jeju     = Button(self.MainWnd, text='제주', width=10, height=5, command=self.Button_Jeju_Input)
+        self.MainWnd_Button_List = []
 
         self.photoGmail = PhotoImage(file="Photo/Gmail_icon.png")
-        self.Button_Gmail = Button(self.MainWnd, image=self.photoGmail, command=self.Button_Gmail_Send)
         self.photoTelegram = PhotoImage(file="Photo/Telegram_icon.png")
-        self.Button_Telegram = Button(self.MainWnd, image=self.photoTelegram, command=self.Button_Telegram_Send)
         self.photoNamuwiki = PhotoImage(file="Photo/Namuwiki_icon.png")
-        self.Button_Namuwiki = Button(self.MainWnd, image=self.photoNamuwiki, command=self.Button_Namuwiki_Link)
 
-        self.Button_Seoul.place(x=200, y=50)
-        self.Button_Bugyoung.place(x=200, y=200)
-        self.Button_Jeju.place(x=200, y=350)
-        self.Button_Gmail.place(x=0, y=580)
-        self.Button_Telegram.place(x=380, y=580)
-        self.Button_Namuwiki.place(x=190, y=580)
+        self.MainSceneButtons()
+
         self.MainWnd.mainloop()
 
-    def Button_Seoul_Input(self):
-        self.Button_Seoul.destroy()
-        self.Button_Bugyoung.destroy()
-        self.Button_Jeju.destroy()
-        self.Button_Gmail.destroy()
-        self.Button_Telegram.destroy()
-        self.Button_Namuwiki.destroy()
+    def MainSceneButtons(self):
+        self.MainWnd_Button_List.append(Button(self.MainWnd, text='서울', width=10, height=5, command=self.ButtonSeoulInput))
+        self.MainWnd_Button_List.append(Button(self.MainWnd, text='부경', width=10, height=5, command=self.ButtonBugyoungInput))
+        self.MainWnd_Button_List.append(Button(self.MainWnd, text='제주', width=10, height=5, command=self.ButtonJejuInput))
+
+        self.MainWnd_Button_List.append(Button(self.MainWnd, image=self.photoGmail, command=self.ButtonGmailSend))
+        self.MainWnd_Button_List.append(Button(self.MainWnd, image=self.photoTelegram, command=self.ButtonTelegramSend))
+        self.MainWnd_Button_List.append(Button(self.MainWnd, image=self.photoNamuwiki, command=Button_Namuwiki_Link))
+
+        self.MainScenePlace()
+
+    def MainScenePlace(self):
+        self.MainWnd_Button_List[0].place(x=200, y=50)
+        self.MainWnd_Button_List[1].place(x=200, y=200)
+        self.MainWnd_Button_List[2].place(x=200, y=350)
+        self.MainWnd_Button_List[3].place(x=0, y=580)
+        self.MainWnd_Button_List[4].place(x=380, y=580)
+        self.MainWnd_Button_List[5].place(x=190, y=580)
+
+    def ButtonSeoulInput(self):
+        for i in range(len(self.MainWnd_Button_List)):
+            self.MainWnd_Button_List[i].destroy()
+
+        XmlProcess.SearchLegion = "1"
+        Result = XmlProcess.SearchHorseProfile("불의여왕")
+        for key, value in Result.items():
+            print(key, ":", value)
 
         self.TurnToSearchScene()
 
-    def Button_Bugyoung_Input(self):
-        self.Button_Seoul.destroy()
-        self.Button_Bugyoung.destroy()
-        self.Button_Jeju.destroy()
-        self.Button_Gmail.destroy()
-        self.Button_Telegram.destroy()
-        self.Button_Namuwiki.destroy()
+    def ButtonBugyoungInput(self):
+        for i in range(len(self.MainWnd_Button_List)):
+            self.MainWnd_Button_List[i].destroy()
+
+        XmlProcess.SearchLegion = "2"
 
         self.TurnToSearchScene()
 
-    def Button_Jeju_Input(self):
-        self.Button_Seoul.destroy()
-        self.Button_Bugyoung.destroy()
-        self.Button_Jeju.destroy()
-        self.Button_Gmail.destroy()
-        self.Button_Telegram.destroy()
-        self.Button_Namuwiki.destroy()
+    def ButtonJejuInput(self):
+        for i in range(len(self.MainWnd_Button_List)):
+            self.MainWnd_Button_List[i].destroy()
 
+        XmlProcess.SearchLegion = "3"
         self.TurnToSearchScene()
 
-    def Button_Gmail_Send(self):
+    def ButtonGmailSend(self):
         pass
 
-    def Button_Telegram_Send(self):
+    def ButtonTelegramSend(self):
         pass
-
-    def Button_Namuwiki_Link(self):
-        url = "https://namu.wiki/w/%EA%B2%BD%EB%A7%88"
-        webbrowser.open(url)
-
 
     def TurnToSearchScene(self):
+        self.MainWnd_Button_List.clear()
+        Button(self.MainWnd, text="복귀", width=10, height=5, command=self.TurnToMainScene).place(x=200, y=50)
         pass
 
     def TurnToMainScene(self):
-        pass
+        self.MainSceneButtons()
+
 
 if __name__ == '__main__':
     MainGui()
