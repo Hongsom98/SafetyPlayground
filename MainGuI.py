@@ -89,8 +89,13 @@ class MainGui:
         pass
 
     def SearchDef(self):
+        self.Datacanvas.delete('data')
         Result = XmlProcess.SearchHorseProfile(self.input_text.get())
+        x = 100
+        y = 90
         for key, value in Result.items():
+            self.Datacanvas.create_text(x,y,text=key + ":" + value,tags='data',justify=LEFT)
+            y = y + 15
             print(key, ":", value)
 
 
