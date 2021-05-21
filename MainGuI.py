@@ -14,6 +14,10 @@ class MainGui:
         self.MainWnd = Tk()
         self.MainWnd.title("SafetyPlayGround")
         self.MainWnd.geometry("480x680+660+240")
+
+        self.senderAddress = 'gksduddls33@gmail.com'
+        self.passwd = 'brownie9065!@'
+
         self.MainWnd.resizable(False, False)
 
         self.MainWnd_Button_List = []
@@ -141,14 +145,36 @@ class MainGui:
 
     def ButtonGmailSend(self):
         global host, port
+        MsgTopLevel = Toplevel(self.MainWnd)
+        MsgTopLevel.geometry("320x200+820+100")
+        MsgTopLevel.title("메일 보내기")
+
 
         html = ""
-        MsgTitle = str(input('Title :'))
-        senderAddr = str(input('sender email address :'))
-        recipientAddr = str(input('recipient email address :'))
-        msgtext = str(input('write message :'))
-        passwd = str(input(' input your password of gmail account :'))
 
+        self.MsgTitle = StringVar()
+        #MsgTitle = str(input('제목 :'))
+
+
+        self.recipientAddr = StringVar()
+        #recipientAddr = str(input('보낼 대상의 이메일을 입력하세요 :'))
+        self.msgtext = StringVar()
+        #msgtext = str(input('내용 :'))
+
+        Label(MsgTopLevel, text="제목 :").place(x=0,y=0)
+        Entry(MsgTopLevel, textvariable=self.MsgTitle, width=20).place(x=40,y=0)
+
+        Label(MsgTopLevel, text="받는이 :").place(x=0, y=20)
+        Entry(MsgTopLevel, textvariable=self.recipientAddr, width=20).place(x=40,y=20)
+
+        Label(MsgTopLevel, text="내용 :").place(x=0, y=40)
+        Entry(MsgTopLevel, textvariable=self.msgtext, width=20).place(x=40,y=40)
+
+        Button(MsgTopLevel, text="발송", command=self.ButtonSend).place(x=100,y=80)
+        #SearchObjectsList.append(Button(MsgTopLevel, text="검색", command=self.SearchDateDef))
+
+
+    def ButtonSend(self):
         import mysmtplib
 
         from email.mime.multipart import MIMEMultipart
@@ -156,27 +182,26 @@ class MainGui:
 
         msg = MIMEMultipart('alternative')
 
-        msg['Subject'] = MsgTitle
-        msg['From'] = senderAddr
-        msg['To'] = recipientAddr
+        msg['Subject'] = self.MsgTitle.get()
+        msg['From'] = self.senderAddress
+        msg['To'] = self.recipientAddr.get()
 
-        msgPart = MIMEText(msgtext, 'plain')
-        bookPart = MIMEText(html, 'html', _charset='UTF-8')
+        msgPart = MIMEText(self.msgtext.get(), 'plain')
+        #bookPart = MIMEText(html, 'html', _charset='UTF-8')
 
         msg.attach(msgPart)
-        msg.attach(bookPart)
 
-        print("connect smtp server ... ")
+        #print("connect smtp server ... ")
         s = mysmtplib.MySMTP(host, port)
 
         s.ehlo()
         s.starttls()
         s.ehlo()
-        s.login(senderAddr, passwd)
-        s.sendmail(senderAddr, [recipientAddr], msg.as_string())
+        s.login(self.senderAddress, self.passwd)
+        s.sendmail(self.senderAddress, [self.recipientAddr.get()], msg.as_string())
         s.close()
 
-        print("Mail sending complete!!!")
+        #print("Mail sending complete!!!")
         pass
 
     def ButtonTelegramSend(self):
