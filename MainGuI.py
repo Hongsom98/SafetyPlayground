@@ -2,6 +2,8 @@ from tkinter import *
 import webbrowser
 import XmlProcess
 
+host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
+port = "587"
 
 def Button_Namuwiki_Link():
     webbrowser.open("https://namu.wiki/w/%EA%B2%BD%EB%A7%88")
@@ -83,6 +85,11 @@ class MainGui:
         pass
 
     def TenserFlow(self):
+        topWnd = Toplevel(self.MainWnd)
+        topWnd.geometry("320x200+820+100")
+
+        topWnd.title("경기 예측 결과")
+
         pass
 
     def SearchDateDef(self):
@@ -133,6 +140,43 @@ class MainGui:
 
 
     def ButtonGmailSend(self):
+        global host, port
+
+        html = ""
+        MsgTitle = str(input('Title :'))
+        senderAddr = str(input('sender email address :'))
+        recipientAddr = str(input('recipient email address :'))
+        msgtext = str(input('write message :'))
+        passwd = str(input(' input your password of gmail account :'))
+
+        import mysmtplib
+
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
+        msg = MIMEMultipart('alternative')
+
+        msg['Subject'] = MsgTitle
+        msg['From'] = senderAddr
+        msg['To'] = recipientAddr
+
+        msgPart = MIMEText(msgtext, 'plain')
+        bookPart = MIMEText(html, 'html', _charset='UTF-8')
+
+        msg.attach(msgPart)
+        msg.attach(bookPart)
+
+        print("connect smtp server ... ")
+        s = mysmtplib.MySMTP(host, port)
+
+        s.ehlo()
+        s.starttls()
+        s.ehlo()
+        s.login(senderAddr, passwd)
+        s.sendmail(senderAddr, [recipientAddr], msg.as_string())
+        s.close()
+
+        print("Mail sending complete!!!")
         pass
 
     def ButtonTelegramSend(self):
