@@ -2,6 +2,12 @@ from tkinter import *
 import webbrowser
 import XmlProcess
 
+from io import BytesIO
+import urllib
+import urllib.request
+from PIL import Image,ImageTk
+
+
 host = "smtp.gmail.com"  # Gmail SMTP 서버 주소.
 port = "587"
 
@@ -67,13 +73,17 @@ class MainGui:
         self.SearchObjectsList.append(Button(self.MainWnd, text="불러오기", command=self.LoadDataDef))
 
         self.input_date = StringVar()  # 경기날짜 입력
-        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_date, width=40))
+        self.input_round = StringVar()  # 경기라운드 입력
+        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_date, width=20))
+        self.SearchObjectsList.append(Label(self.MainWnd, text="날짜"))
+        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_round, width=20))
+        self.SearchObjectsList.append(Label(self.MainWnd, text="라운드"))
         self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.SearchDateDef))
 
         self.SearchObjectsList.append(Button(self.MainWnd, text="다음 경기 예측하기", command=self.TenserFlow, width=64, height=3))
 
         # self.SearchObjectsList.append(Canvas(self.MainWnd,bg='white',width=400,height=300))
-        self.Datacanvas = Canvas(self.MainWnd, bg='white', width=450, height=300)
+        self.Datacanvas = Canvas(self.MainWnd, bg='white', width=150, height=300)
         self.Datacanvas.pack()
         self.Graphcanvas = Canvas(self.MainWnd, bg='white', width=450, height=170)
         self.Graphcanvas.pack()
@@ -84,8 +94,12 @@ class MainGui:
         self.SearchObjectsList[1].place(x=220, y=49)
         self.SearchObjectsList[2].place(x=260, y=49)
         self.SearchObjectsList[3].place(x=0, y=650)
-        self.SearchObjectsList[4].place(x=290, y=649)
-        self.SearchObjectsList[5].place(x=10, y=400)
+        self.SearchObjectsList[4].place(x=150, y=650)
+        self.SearchObjectsList[5].place(x=180, y=650)
+        self.SearchObjectsList[6].place(x=300, y=649)
+        self.SearchObjectsList[7].place(x=370, y=649)
+        self.SearchObjectsList[8].place(x=10, y=400)
+
         self.Datacanvas.place(x=10, y=90)
         self.Graphcanvas.place(x=10, y=465)
 
@@ -101,18 +115,35 @@ class MainGui:
         pass
 
     def SearchDateDef(self):
+        self.VideoOpen = "http://kra.fiveplayer.co.kr/player.php?f=" + self.input_date.get() + "/s" + self.input_round.get() + "r"
+        from selenium import webdriver
+        driver = webdriver.Chrome('chromedriver.exe')
+        driver.implicitly_wait(3)
+        driver.get(self.VideoOpen)
         pass
 
     def SearchDef(self):
         self.Datacanvas.delete('data')
         Result = XmlProcess.SearchHorseProfile(self.input_text.get())
-        x = 100
-        y = 90
+        x = 10
+        y = 15
 
         for key, value in Result.items():
-            self.Datacanvas.create_text(x, y, text=key + ":" + value, tags='data', justify=LEFT)
+            self.Datacanvas.create_text(x, y, text=key + ":" + value, tags='data', justify=LEFT, anchor = W)
+            if key == "hrNo":
+                self.HrNo = value
+                print(self.HrNo)
             y = y + 15
             print(key, ":", value)
+        urlFirst = 'https://studbook.kra.co.kr/h_photo/' #042/042945-l.jpg'
+        url = urlFirst + self.HrNo[0] + self.HrNo[1] + self.HrNo[2] + '/' + self.HrNo + '-l.jpg'
+
+        with urllib.request.urlopen(url) as u:
+            raw_data = u.read()
+        im = Image.open(BytesIO(raw_data))
+        image = ImageTk.PhotoImage(im)
+        Label(self.MainWnd, image=image, height = 100, width = 100).place(x=300,y=100)
+        #webbrowser.open(url)
 
     def TurnToSearchScene(self):
         for i in range(len(self.MainWnd_Button_List)):
