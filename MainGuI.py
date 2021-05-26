@@ -134,16 +134,20 @@ class MainGui:
                 self.HrNo = value
                 print(self.HrNo)
             y = y + 15
-            print(key, ":", value)
+            # print(key, ":", value)
         urlFirst = 'https://studbook.kra.co.kr/h_photo/' #042/042945-l.jpg'
         url = urlFirst + self.HrNo[0] + self.HrNo[1] + self.HrNo[2] + '/' + self.HrNo + '-l.jpg'
 
         with urllib.request.urlopen(url) as u:
             raw_data = u.read()
         im = Image.open(BytesIO(raw_data))
+        im = im.resize((300, 300))
         image = ImageTk.PhotoImage(im)
-        Label(self.MainWnd, image=image, height = 100, width = 100).place(x=300,y=100)
-        #webbrowser.open(url)
+
+        temp = Label(self.MainWnd, image=image)
+        temp.image = image
+        temp.place(x=170, y=90)
+        # webbrowser.open(url)
 
     def TurnToSearchScene(self):
         for i in range(len(self.MainWnd_Button_List)):
