@@ -8,6 +8,18 @@ import urllib.request
 from PIL import Image,ImageTk
 
 
+from selenium import webdriver
+from bs4 import BeautifulSoup as bs
+import pandas as pd
+from selenium.webdriver.common.keys import Keys
+import time
+
+# pip install folium
+import folium
+import sys
+# pip install cefpython3==66.1
+from cefpython3 import cefpython as cef
+
 host = "smtp.gmail.com"  # Gmail SMTP 서버 주소.
 port = "587"
 
@@ -40,7 +52,7 @@ class MainGui:
 
         self.Datacanvas = None
         self.Graphcanvas = None
-
+        self.SelectRocation = None
         self.MsgTitle = None
         self.recipientAddr = None
         self.msgtext = None
@@ -79,7 +91,7 @@ class MainGui:
         self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_round, width=20))
         self.SearchObjectsList.append(Label(self.MainWnd, text="라운드"))
         self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.SearchDateDef))
-
+        #self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.PressDate))
         self.SearchObjectsList.append(Button(self.MainWnd, text="다음 경기 예측하기", command=self.TenserFlow, width=64, height=3))
 
         # self.SearchObjectsList.append(Canvas(self.MainWnd,bg='white',width=400,height=300))
@@ -113,14 +125,59 @@ class MainGui:
         topWnd.title("경기 예측 결과")
 
         pass
+    def PressDate(self):
+        thread = threading.Thread(target=self.SearchDateDef)
+        thread.daemon = True
+        thread.start()
 
     def SearchDateDef(self):
-        self.VideoOpen = "http://kra.fiveplayer.co.kr/player.php?f=" + self.input_date.get() + "/s" + self.input_round.get() + "r"
+        #self.VideoOpen = "http://kra.fiveplayer.co.kr/player.php?f=" + self.input_date.get() + "/s" + self.input_round.get() + "r"
+        #print(self.VideoOpen)
+       # sys.excepthook = cef.ExceptHook
+        #frame = Frame(window, width=800, height=600)
+        #window_info = cef.WindowInfo(frame.winfo_id())
+        #window_info.SetAsChile(frame.winfo_id(), [0,0,800,600])
+        #cef.Initialize()
+        #browser = cef.CreateBrowserSync(window_info, url = self.VideoOpen)
+        #cef.MessageLoop()
+
+       # print(url)
+        #root.destroy()
+        keyword = self.SelectRocation + " "+ self.input_date.get() + " " + self.input_round.get() + "경주"
+        url = 'https://www.youtube.com/results?search_query={}'.format(keyword)
+        print(url)
+        driver = webdriver.Chrome('./chromedriver.exe')
+        driver.get(url)
+        soup = bs(driver.page_source, 'html.parser')
+        driver.close()
+
+        video_url = soup.select('a#video-title')
+        url_list = []
+
+        url_list.append('{}{}'.format('https://www.youtube.com', video_url[0].get('href')))
+        sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+        cef.Initialize()
+        cef.CreateBrowserSync(url=url_list[0], window_title="경마 시청")
+        # us = 'https://www.youtube.com/watch?v=dXRtt_2yP7w&t=2s'
+        # cef.CreateBrowserSync(url=us, window_title="경마 시청")
+        cef.MessageLoop()
+
+
+        '''sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+        cef.Initialize()
+        cef.CreateBrowserSync(url=self.VideoOpen,window_title="경마 시청")
+        #us = 'https://www.youtube.com/watch?v=dXRtt_2yP7w&t=2s'
+        #cef.CreateBrowserSync(url=us, window_title="경마 시청")
+        cef.MessageLoop()'''
+        '''
         from selenium import webdriver
         driver = webdriver.Chrome('chromedriver.exe')
         driver.implicitly_wait(3)
         driver.get(self.VideoOpen)
+        '''
         pass
+
+
 
     def SearchDef(self):
         self.Datacanvas.delete('data')
@@ -165,17 +222,17 @@ class MainGui:
 
     def ButtonSeoulInput(self):
         XmlProcess.SearchLegion = "1"
-
+        self.SelectRocation = "(서울)"
         self.TurnToSearchScene()
 
     def ButtonBugyoungInput(self):
         XmlProcess.SearchLegion = "2"
-
+        self.SelectRocation = "(부경)"
         self.TurnToSearchScene()
 
     def ButtonJejuInput(self):
         XmlProcess.SearchLegion = "3"
-
+        self.SelectRocation = "(제주)"
         self.TurnToSearchScene()
 
     def ButtonGmailSend(self):
