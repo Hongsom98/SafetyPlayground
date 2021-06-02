@@ -7,6 +7,7 @@ import urllib
 import urllib.request
 from PIL import Image,ImageTk
 
+import pickle
 
 from selenium import webdriver
 from bs4 import BeautifulSoup as bs
@@ -14,12 +15,14 @@ import pandas as pd
 from selenium.webdriver.common.keys import Keys
 import time
 
-# pip install folium
 import folium
 import sys
-# pip install cefpython3==66.1
 from cefpython3 import cefpython as cef
 
+from tkinter.filedialog import askopenfilename
+import tkinter.messagebox
+
+from youtubesearchpython import *
 host = "smtp.gmail.com"  # Gmail SMTP 서버 주소.
 port = "587"
 
@@ -33,7 +36,7 @@ class MainGui:
         self.MainWnd = Tk()
         self.MainWnd.title("SafetyPlayGround")
         self.MainWnd.geometry("480x680+660+240")
-
+        #self.MainWnd.configure(background="black")
         self.senderAddress = 'gksduddls33@gmail.com'
         self.passwd = 'brownie9065!@'
 
@@ -45,10 +48,12 @@ class MainGui:
         self.photoGmail = PhotoImage(file="Photo/Gmail_icon.png")
         self.photoTelegram = PhotoImage(file="Photo/Telegram_icon.png")
         self.photoNamuwiki = PhotoImage(file="Photo/Namuwiki_icon.png")
-
+        self.photoWhiteStar = PhotoImage(file="Photo/book_mark_off.png")
+        self.photoYellowStar = PhotoImage(file="Photo/book_mark_on.png")
         self.input_text = None
         self.input_date = None
         self.MainSceneButtons()
+        self.FavList = None
 
         self.Datacanvas = None
         self.Graphcanvas = None
@@ -80,20 +85,20 @@ class MainGui:
 
     def SetSearchButtons(self):
         self.input_text = StringVar()  # 경주마 이름 입력
-        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_text, width=30))
-        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.SearchDef))
-        self.SearchObjectsList.append(Button(self.MainWnd, text="불러오기", command=self.LoadDataDef))
+        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_text, width=30)) # 0
+        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.SearchDef)) #1
+        self.SearchObjectsList.append(Button(self.MainWnd, text="불러오기", command=self.LoadDataDef)) #2
 
         self.input_date = StringVar()  # 경기날짜 입력
         self.input_round = StringVar()  # 경기라운드 입력
-        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_date, width=20))
-        self.SearchObjectsList.append(Label(self.MainWnd, text="날짜"))
-        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_round, width=20))
-        self.SearchObjectsList.append(Label(self.MainWnd, text="라운드"))
-        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.SearchDateDef))
+        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_date, width=20)) # 날짜 3
+        self.SearchObjectsList.append(Label(self.MainWnd, text="날짜")) # 4
+        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_round, width=20)) # 라운드 5
+        self.SearchObjectsList.append(Label(self.MainWnd, text="라운드")) # 6
+        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.SearchDateDef)) # 검색 7
         #self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.PressDate))
-        self.SearchObjectsList.append(Button(self.MainWnd, text="다음 경기 예측하기", command=self.TenserFlow, width=64, height=3))
-
+        self.SearchObjectsList.append(Button(self.MainWnd, text="다음 경기 예측하기", command=self.TenserFlow, width=64, height=3)) # 예측 8
+        self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50, height=50)) # 북마크 9
         # self.SearchObjectsList.append(Canvas(self.MainWnd,bg='white',width=400,height=300))
         self.Datacanvas = Canvas(self.MainWnd, bg='white', width=150, height=300)
         self.Datacanvas.pack()
@@ -111,13 +116,27 @@ class MainGui:
         self.SearchObjectsList[6].place(x=300, y=649)
         self.SearchObjectsList[7].place(x=370, y=649)
         self.SearchObjectsList[8].place(x=10, y=400)
-
+        self.SearchObjectsList[9].place(x=320, y=30)
         self.Datacanvas.place(x=10, y=90)
         self.Graphcanvas.place(x=10, y=465)
 
     def LoadDataDef(self):
-        pass
 
+        try:
+            with open('bookmark', 'rb') as f:
+                self.FavList = pickle.load(f)
+                print("성공")
+        except:
+            print("실패")
+            pass
+        pass
+    def Favorate(self):
+        self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
+        Result = XmlProcess.SearchHorseProfile(self.input_text.get())
+        self.FavList.append(Result)
+        with open('bookmark', 'wb') as f:
+            pickle.dump(Result,f)
+        pass
     def TenserFlow(self):
         topWnd = Toplevel(self.MainWnd)
         topWnd.geometry("320x200+820+100")
@@ -131,50 +150,21 @@ class MainGui:
         thread.start()
 
     def SearchDateDef(self):
-        #self.VideoOpen = "http://kra.fiveplayer.co.kr/player.php?f=" + self.input_date.get() + "/s" + self.input_round.get() + "r"
-        #print(self.VideoOpen)
-       # sys.excepthook = cef.ExceptHook
-        #frame = Frame(window, width=800, height=600)
-        #window_info = cef.WindowInfo(frame.winfo_id())
-        #window_info.SetAsChile(frame.winfo_id(), [0,0,800,600])
-        #cef.Initialize()
-        #browser = cef.CreateBrowserSync(window_info, url = self.VideoOpen)
-        #cef.MessageLoop()
-
-       # print(url)
-        #root.destroy()
         keyword = self.SelectRocation + " "+ self.input_date.get() + " " + self.input_round.get() + "경주"
-        url = 'https://www.youtube.com/results?search_query={}'.format(keyword)
-        print(url)
-        driver = webdriver.Chrome('./chromedriver.exe')
-        driver.get(url)
-        soup = bs(driver.page_source, 'html.parser')
-        driver.close()
 
-        video_url = soup.select('a#video-title')
-        url_list = []
+        print(keyword)
+        videoSearch = VideosSearch(keyword,limit=10)
 
-        url_list.append('{}{}'.format('https://www.youtube.com', video_url[0].get('href')))
+        result = videoSearch.result()
+        for i in range(10):
+            print(result['result'][i]['title'], end='->')
+            print(result['result'][i]['link'])
         sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
         cef.Initialize()
-        cef.CreateBrowserSync(url=url_list[0], window_title="경마 시청")
+        cef.CreateBrowserSync(url=result['result'][0]['link'], window_title="경마 시청")
         # us = 'https://www.youtube.com/watch?v=dXRtt_2yP7w&t=2s'
         # cef.CreateBrowserSync(url=us, window_title="경마 시청")
         cef.MessageLoop()
-
-
-        '''sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-        cef.Initialize()
-        cef.CreateBrowserSync(url=self.VideoOpen,window_title="경마 시청")
-        #us = 'https://www.youtube.com/watch?v=dXRtt_2yP7w&t=2s'
-        #cef.CreateBrowserSync(url=us, window_title="경마 시청")
-        cef.MessageLoop()'''
-        '''
-        from selenium import webdriver
-        driver = webdriver.Chrome('chromedriver.exe')
-        driver.implicitly_wait(3)
-        driver.get(self.VideoOpen)
-        '''
         pass
 
 
@@ -184,6 +174,12 @@ class MainGui:
         Result = XmlProcess.SearchHorseProfile(self.input_text.get())
         x = 10
         y = 15
+        for i in self.FavList.values():
+            #print(i.find(str(Result["hrNo"])))
+            if (i.find(str(Result["hrNo"])) == 0 ):
+                print("있음")
+            else:
+                print("없음")
 
         for key, value in Result.items():
             self.Datacanvas.create_text(x, y, text=key + ":" + value, tags='data', justify=LEFT, anchor = W)
