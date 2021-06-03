@@ -1,6 +1,8 @@
 import urllib
 import http.client
-from xml.dom.minidom import parse, parseString
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+from html_table_parser import parser_functions as parser
 from xml.etree import ElementTree
 
 SearchLegion = None
@@ -24,8 +26,22 @@ def SearchHorseProfile(InputHorseName):
     else:
         print("Xml DownLoad Error")
 
+def SearchHorseRaceResults(InputHorseNum):
+    url = "https://studbook.kra.co.kr/html/info/ind/s_race_result.jsp?mabun=" + InputHorseNum
+    result = urlopen(url)
+    html = result.read()
+    soup = BeautifulSoup(html, "html.parser")
+    tables = soup.find_all('table')
+    p = parser.make2d(tables[2])
+    del p[0]
+    dateList = []
+    rankList = []
+    for i in p:
+        dateList.append(i[0])
+        rankList.append(int(i[6]))
+    return [dateList, rankList]
+
 def ExtractData(XmlStr):
-    from xml.etree import ElementTree
     Tree = ElementTree.fromstring(XmlStr)
 
     ItemInElements = Tree.iter("item")
@@ -45,4 +61,5 @@ def ExtractData(XmlStr):
         Result["sex"] = item.find("sex").text
         Result["trName"] = item.find("trName").text
         Result["trNo"] = item.find("trNo").text
-    return Result
+    raceList = SearchHorseRaceResults(Result["hrNo"])
+    return [Result, raceList]

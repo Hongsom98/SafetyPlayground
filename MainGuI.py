@@ -121,7 +121,6 @@ class MainGui:
         self.Graphcanvas.place(x=10, y=465)
 
     def LoadDataDef(self):
-
         try:
             with open('bookmark', 'rb') as f:
                 self.FavList = pickle.load(f)
@@ -129,21 +128,20 @@ class MainGui:
         except:
             print("실패")
             pass
-        pass
+
     def Favorate(self):
         self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
         Result = XmlProcess.SearchHorseProfile(self.input_text.get())
         self.FavList.append(Result)
         with open('bookmark', 'wb') as f:
             pickle.dump(Result,f)
-        pass
+
     def TenserFlow(self):
         topWnd = Toplevel(self.MainWnd)
         topWnd.geometry("320x200+820+100")
 
         topWnd.title("경기 예측 결과")
 
-        pass
     def PressDate(self):
         thread = threading.Thread(target=self.SearchDateDef)
         thread.daemon = True
@@ -159,29 +157,28 @@ class MainGui:
         for i in range(10):
             print(result['result'][i]['title'], end='->')
             print(result['result'][i]['link'])
-        sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+        sys.excepthook = cef.ExceptHook
         cef.Initialize()
         cef.CreateBrowserSync(url=result['result'][0]['link'], window_title="경마 시청")
-        # us = 'https://www.youtube.com/watch?v=dXRtt_2yP7w&t=2s'
-        # cef.CreateBrowserSync(url=us, window_title="경마 시청")
         cef.MessageLoop()
-        pass
-
-
 
     def SearchDef(self):
         self.Datacanvas.delete('data')
-        Result = XmlProcess.SearchHorseProfile(self.input_text.get())
+        ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
+        HorseInfo = ReturnResult[0]
+        HorseRaceDate = ReturnResult[1][0]
+        HorseRaceRank = ReturnResult[1][1]
         x = 10
         y = 15
-        for i in self.FavList.values():
-            #print(i.find(str(Result["hrNo"])))
-            if (i.find(str(Result["hrNo"])) == 0 ):
-                print("있음")
-            else:
-                print("없음")
-
-        for key, value in Result.items():
+        #for i in self.FavList.values():
+        #    #print(i.find(str(Result["hrNo"])))
+        #    if (i.find(str(Result["hrNo"])) == 0 ):
+        #        print("있음")
+        #    else:
+        #        print("없음")
+        print(HorseRaceDate)
+        print(HorseRaceRank)
+        for key, value in HorseInfo.items():
             self.Datacanvas.create_text(x, y, text=key + ":" + value, tags='data', justify=LEFT, anchor = W)
             if key == "hrNo":
                 self.HrNo = value
@@ -200,7 +197,6 @@ class MainGui:
         temp = Label(self.MainWnd, image=image)
         temp.image = image
         temp.place(x=170, y=90)
-        # webbrowser.open(url)
 
     def TurnToSearchScene(self):
         for i in range(len(self.MainWnd_Button_List)):
@@ -240,12 +236,9 @@ class MainGui:
         html = ""
 
         self.MsgTitle = StringVar()
-        # MsgTitle = str(input('제목 :'))
 
         self.recipientAddr = StringVar()
-        # recipientAddr = str(input('보낼 대상의 이메일을 입력하세요 :'))
         self.msgtext = StringVar()
-        # msgtext = str(input('내용 :'))
 
         Label(MsgTopLevel, text="제목 :").place(x=0, y=0)
         Entry(MsgTopLevel, textvariable=self.MsgTitle, width=20).place(x=40, y=0)
@@ -257,7 +250,6 @@ class MainGui:
         Entry(MsgTopLevel, textvariable=self.msgtext, width=20).place(x=40, y=40)
 
         Button(MsgTopLevel, text="발송", command=self.ButtonSend).place(x=100, y=80)
-        # SearchObjectsList.append(Button(MsgTopLevel, text="검색", command=self.SearchDateDef))
 
     def ButtonSend(self):
         import mysmtplib
@@ -272,11 +264,9 @@ class MainGui:
         msg['To'] = self.recipientAddr.get()
 
         msgPart = MIMEText(self.msgtext.get(), 'plain')
-        # bookPart = MIMEText(html, 'html', _charset='UTF-8')
 
         msg.attach(msgPart)
 
-        # print("connect smtp server ... ")
         s = mysmtplib.MySMTP(host, port)
 
         s.ehlo()
@@ -285,9 +275,6 @@ class MainGui:
         s.login(self.senderAddress, self.passwd)
         s.sendmail(self.senderAddress, [self.recipientAddr.get()], msg.as_string())
         s.close()
-
-        # print("Mail sending complete!!!")
-        pass
 
     def ButtonTelegramSend(self):
         pass
