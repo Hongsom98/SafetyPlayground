@@ -53,7 +53,7 @@ class MainGui:
         self.input_text = None
         self.input_date = None
         self.MainSceneButtons()
-        self.FavList = None
+        self.FavList = []
 
         self.Datacanvas = None
         self.Graphcanvas = None
@@ -165,6 +165,7 @@ class MainGui:
     def SearchDef(self):
         self.Datacanvas.delete('data')
         ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
+        print(ReturnResult[0])
         HorseInfo = ReturnResult[0]
         HorseRaceDate = ReturnResult[1][0]
         HorseRaceRank = ReturnResult[1][1]
@@ -178,12 +179,42 @@ class MainGui:
         #        print("없음")
         print(HorseRaceDate)
         print(HorseRaceRank)
-        for key, value in HorseInfo.items():
-            self.Datacanvas.create_text(x, y, text=key + ":" + value, tags='data', justify=LEFT, anchor = W)
+        '''for key, value in HorseInfo.items():
+            self.Datacanvas.create_text(x, y, text=":" + value, tags='data', justify=LEFT, anchor = W)
             if key == "hrNo":
                 self.HrNo = value
                 print(self.HrNo)
-            y = y + 15
+            y = y + 15'''
+        for i in range(13):
+            if i ==0:
+                self.Datacanvas.create_text(x, y, text= "sangil:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==1:
+                self.Datacanvas.create_text(x, y, text="chacksun:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==2:
+                self.Datacanvas.create_text(x, y, text="이름:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==3:
+                self.Datacanvas.create_text(x, y, text="ma bun:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.HrNo = ReturnResult[0][3]
+            elif i ==4:
+                self.Datacanvas.create_text(x, y, text="taeunangot:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==5:
+                self.Datacanvas.create_text(x, y, text="pyung zum:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==6:
+                self.Datacanvas.create_text(x, y, text="rating:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==7:
+                self.Datacanvas.create_text(x, y, text="ord1:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==8:
+                self.Datacanvas.create_text(x, y, text="ord2:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==9:
+                self.Datacanvas.create_text(x, y, text="ord3:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==10:
+                self.Datacanvas.create_text(x, y, text="sex:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==11:
+                self.Datacanvas.create_text(x, y, text="trName:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            elif i ==12:
+                self.Datacanvas.create_text(x, y, text="trNo:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+            y = y+15
+
             # print(key, ":", value)
         urlFirst = 'https://studbook.kra.co.kr/h_photo/' #042/042945-l.jpg'
         url = urlFirst + self.HrNo[0] + self.HrNo[1] + self.HrNo[2] + '/' + self.HrNo + '-l.jpg'

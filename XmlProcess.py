@@ -46,8 +46,10 @@ def ExtractData(XmlStr):
 
     ItemInElements = Tree.iter("item")
 
-    Result = {}
-    for item in ItemInElements:
+    Result = []
+    lst = []
+
+    '''for item in ItemInElements:
         Result["birthday"] = item.find("birthday").text
         Result["chaksunT"] = item.find("chaksunT").text
         Result["hrName"] = item.find("hrName").text
@@ -60,6 +62,22 @@ def ExtractData(XmlStr):
         Result["ord3CntY"] = item.find("ord3CntY").text
         Result["sex"] = item.find("sex").text
         Result["trName"] = item.find("trName").text
-        Result["trNo"] = item.find("trNo").text
-    raceList = SearchHorseRaceResults(Result["hrNo"])
+        Result["trNo"] = item.find("trNo").text'''
+    for item in ItemInElements:
+        Result.append(item.find("birthday").text)
+        Result.append(item.find("chaksunT").text)
+        Result.append(item.find("hrName").text)
+        Result.append(item.find("hrNo").text)
+        Result.append(item.find("name").text)
+        Result.append(item.find("rank").text)
+        Result.append(item.find("rating").text)
+        Result.append(item.find("ord1CntY").text)
+        Result.append(item.find("ord2CntY").text)
+        Result.append(item.find("ord3CntY").text)
+        Result.append(item.find("sex").text)
+        Result.append(item.find("trName").text)
+        Result.append(item.find("trNo").text)
+    #raceList = SearchHorseRaceResults(Result["hrNo"])
+    raceList = SearchHorseRaceResults(Result[3])
+    print(raceList)
     return [Result, raceList]
