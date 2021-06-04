@@ -34,11 +34,13 @@ def SearchHorseRaceResults(InputHorseNum):
     p = parser.make2d(tables[2])
     del p[0]
     dateList = []
+    roundList = []
     rankList = []
     for i in p:
-        dateList.append(i[0])
+        dateList.append('.'.join(i[0].split('-')))
+        roundList.append(i[1])
         rankList.append(int(i[6]))
-    return [dateList, rankList]
+    return [dateList, roundList,rankList]
 
 def ExtractData(XmlStr):
     Tree = ElementTree.fromstring(XmlStr)
