@@ -23,6 +23,8 @@ from tkinter.filedialog import askopenfilename
 import tkinter.messagebox
 
 from youtubesearchpython import *
+
+from tkcalendar import Calendar, DateEntry
 host = "smtp.gmail.com"  # Gmail SMTP 서버 주소.
 port = "587"
 
@@ -100,6 +102,7 @@ class MainGui:
         self.SearchObjectsList.append(Button(self.MainWnd, text="다음 경기 예측하기", command=self.TenserFlow, width=64, height=3)) # 예측 8
         self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50, height=50)) # 북마크 9
         # self.SearchObjectsList.append(Canvas(self.MainWnd,bg='white',width=400,height=300))
+        self.SearchObjectsList.append(Button(self.MainWnd, text="날짜선택", command=self.dateSelect, width=20))  # 예측 10
         self.Datacanvas = Canvas(self.MainWnd, bg='white', width=150, height=300)
         self.Datacanvas.pack()
         self.Graphcanvas = Canvas(self.MainWnd, bg='white', width=450, height=170)
@@ -117,6 +120,7 @@ class MainGui:
         self.SearchObjectsList[7].place(x=370, y=649)
         self.SearchObjectsList[8].place(x=10, y=400)
         self.SearchObjectsList[9].place(x=320, y=30)
+        self.SearchObjectsList[10].place(x=0, y=650)
         self.Datacanvas.place(x=10, y=90)
         self.Graphcanvas.place(x=10, y=465)
 
@@ -172,7 +176,7 @@ class MainGui:
         thread.start()
 
     def SearchDateDef(self):
-        keyword = self.SelectRocation + " "+ self.input_date.get() + " " + self.input_round.get() + "경주"
+        keyword = self.SelectRocation + " "+ self.input_date + " " + self.input_round.get() + "경주"
 
         print(keyword)
         videoSearch = VideosSearch(keyword,limit=10)
@@ -185,6 +189,20 @@ class MainGui:
         cef.Initialize()
         cef.CreateBrowserSync(url=result['result'][0]['link'], window_title="경마 시청")
         cef.MessageLoop()
+
+    def dateSelect(self):
+        def print_sel():
+            k = str(cal.selection_get())
+            print(k[5:7])
+            self.input_date = k[0:4]+"."+k[5:7] + "." + k[8:10]
+
+        top = Toplevel(self.MainWnd)
+
+        cal = Calendar(top,
+                       font="Arial 14", selectmode='day',
+                       cursor="hand1", year=2021, month=6, day=5)
+        cal.pack(fill="both", expand=True)
+        Button(top, text="ok", command=print_sel).pack()
 
     def SearchDef(self):
         self.Datacanvas.delete('data')
@@ -217,32 +235,32 @@ class MainGui:
             y = y + 15'''
         for i in range(13):
             if i ==0:
-                self.Datacanvas.create_text(x, y, text= "sangil:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text= "생일:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==1:
-                self.Datacanvas.create_text(x, y, text="chacksun:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="상금:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==2:
                 self.Datacanvas.create_text(x, y, text="이름:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==3:
-                self.Datacanvas.create_text(x, y, text="ma bun:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="마번:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
                 self.HrNo = ReturnResult[0][3]
             elif i ==4:
-                self.Datacanvas.create_text(x, y, text="taeunangot:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="태어난곳:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==5:
-                self.Datacanvas.create_text(x, y, text="pyung zum:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="등급조건:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==6:
-                self.Datacanvas.create_text(x, y, text="rating:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="레이팅:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==7:
-                self.Datacanvas.create_text(x, y, text="ord1:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="최근 1착:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==8:
-                self.Datacanvas.create_text(x, y, text="ord2:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="최근 2착:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==9:
-                self.Datacanvas.create_text(x, y, text="ord3:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="최근 3착:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==10:
-                self.Datacanvas.create_text(x, y, text="sex:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="성별:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==11:
-                self.Datacanvas.create_text(x, y, text="trName:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="조교사명:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             elif i ==12:
-                self.Datacanvas.create_text(x, y, text="trNo:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
+                self.Datacanvas.create_text(x, y, text="조교사번호:" + ReturnResult[0][i], tags='data', justify=LEFT, anchor=W)
             y = y+15
 
             # print(key, ":", value)

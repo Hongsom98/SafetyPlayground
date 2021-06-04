@@ -9,13 +9,12 @@ from tkcalendar import Calendar, DateEntry
 
 def example1():
     def print_sel():
-        print(cal.selection_get())
-
+        k = str(cal.selection_get())
     top = tk.Toplevel(root)
 
     cal = Calendar(top,
                    font="Arial 14", selectmode='day',
-                   cursor="hand1", year=2018, month=2, day=5)
+                   cursor="hand1", year=2021, month=6, day=5)
     cal.pack(fill="both", expand=True)
     ttk.Button(top, text="ok", command=print_sel).pack()
 
