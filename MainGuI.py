@@ -130,11 +130,26 @@ class MainGui:
             pass
 
     def Favorate(self):
-        self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
-        Result = XmlProcess.SearchHorseProfile(self.input_text.get())
-        self.FavList.append(Result)
+        self.SearchObjectsList[9].destroy()
+        Result=XmlProcess.SearchHorseProfile(self.input_text.get())
+        if Result[0] in self.FavList:
+            self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50,height=50)
+            self.FavList.remove(Result)
+        else:
+            self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate,width=50, height=50)
+            self.FavList.append(Result)
+        '''for i in self.FavList :
+            if i == Result[0] :
+                self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50, height=50)
+                del self.FavList[i]
+                break
+            else:
+                self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
+                self.FavList.append(Result)'''
         with open('bookmark', 'wb') as f:
-            pickle.dump(Result,f)
+            pickle.dump(Result, f)
+        self.SearchObjectsList[9].place(x=320, y=30)
+
 
     def TenserFlow(self):
         topWnd = Toplevel(self.MainWnd)
@@ -165,6 +180,14 @@ class MainGui:
     def SearchDef(self):
         self.Datacanvas.delete('data')
         ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
+        self.SearchObjectsList[9].destroy()
+        for i in self.FavList :
+            if i == ReturnResult[0] :
+                self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
+                break
+            else :
+                self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50, height=50)
+        self.SearchObjectsList[9].place(x=320, y=30)
         print(ReturnResult[0])
         HorseInfo = ReturnResult[0]
         HorseRaceDate = ReturnResult[1][0]
@@ -177,8 +200,8 @@ class MainGui:
         #        print("있음")
         #    else:
         #        print("없음")
-        print(HorseRaceDate)
-        print(HorseRaceRank)
+        #print(HorseRaceDate)
+        #print(HorseRaceRank)
         '''for key, value in HorseInfo.items():
             self.Datacanvas.create_text(x, y, text=":" + value, tags='data', justify=LEFT, anchor = W)
             if key == "hrNo":
