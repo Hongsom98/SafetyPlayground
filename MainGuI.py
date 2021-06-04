@@ -125,6 +125,8 @@ class MainGui:
             with open('bookmark', 'rb') as f:
                 self.FavList = pickle.load(f)
                 print("성공")
+                print(self.FavList)
+                print("여기까지 리스트")
         except:
             print("실패")
             pass
@@ -132,12 +134,19 @@ class MainGui:
     def Favorate(self):
         self.SearchObjectsList[9].destroy()
         Result=XmlProcess.SearchHorseProfile(self.input_text.get())
+        print("시작")
+        print(self.FavList)
+        print("중간시작")
+        print(Result)
+        print("끝")
         if Result[0] in self.FavList:
+            print("리스트에있음")
             self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50,height=50)
-            self.FavList.remove(Result)
+            self.FavList.remove(Result[0])
         else:
+            print("리스트에없음")
             self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate,width=50, height=50)
-            self.FavList.append(Result)
+            self.FavList.append(Result[0])
         '''for i in self.FavList :
             if i == Result[0] :
                 self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50, height=50)
@@ -147,7 +156,7 @@ class MainGui:
                 self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
                 self.FavList.append(Result)'''
         with open('bookmark', 'wb') as f:
-            pickle.dump(Result, f)
+            pickle.dump(self.FavList, f)
         self.SearchObjectsList[9].place(x=320, y=30)
 
 
@@ -181,12 +190,10 @@ class MainGui:
         self.Datacanvas.delete('data')
         ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
         self.SearchObjectsList[9].destroy()
-        for i in self.FavList :
-            if i == ReturnResult[0] :
-                self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
-                break
-            else :
-                self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50, height=50)
+        if ReturnResult[0] in self.FavList:
+            self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorate, width=50, height=50)
+        else:
+            self.SearchObjectsList[9] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorate, width=50,height=50)
         self.SearchObjectsList[9].place(x=320, y=30)
         print(ReturnResult[0])
         HorseInfo = ReturnResult[0]
