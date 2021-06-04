@@ -1,4 +1,5 @@
 from tkinter import *
+from tkcalendar import *
 import webbrowser
 import XmlProcess
 from io import BytesIO
@@ -35,7 +36,9 @@ class MainGui:
         self.photoNamuwiki = PhotoImage(file="Photo/Namuwiki_icon.png")
         self.photoWhiteStar = PhotoImage(file="Photo/book_mark_off.png")
         self.photoYellowStar = PhotoImage(file="Photo/book_mark_on.png")
+        self.photoBack = PhotoImage(file="Photo/Back_icon.png")
         self.input_text = StringVar()
+        self.ForRaceDateSelector = StringVar()
         self.FavList = []
 
         self.Datacanvas = None
@@ -55,9 +58,9 @@ class MainGui:
         self.MainObjectList.append(Button(self.MainWnd, text='부경', width=10, height=5, command=self.ButtonBugyoungInput))
         self.MainObjectList.append(Button(self.MainWnd, text='제주', width=10, height=5, command=self.ButtonJejuInput))
 
-        self.MainObjectList.append(Button(self.MainWnd, image=self.photoGmail, command=self.ButtonGmailSend))
-        self.MainObjectList.append(Button(self.MainWnd, image=self.photoTelegram, command=self.ButtonTelegramSend))
-        self.MainObjectList.append(Button(self.MainWnd, image=self.photoNamuwiki, command=Button_Namuwiki_Link))
+        self.MainObjectList.append(Button(self.MainWnd, image=self.photoGmail, borderwidth=0, command=self.ButtonGmailSend))
+        self.MainObjectList.append(Button(self.MainWnd, image=self.photoTelegram, borderwidth=0, command=self.ButtonTelegramSend))
+        self.MainObjectList.append(Button(self.MainWnd, image=self.photoNamuwiki, borderwidth=0, command=Button_Namuwiki_Link))
 
         self.MainScenePlace()
 
@@ -70,22 +73,45 @@ class MainGui:
         self.MainObjectList[5].place(x=190, y=580)
 
     def SetSearchButtons(self):
-        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_text, width=30))  # 0
-        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", command=self.SearchDef))  # 1
+        self.input_text.set("마명이나 원하는 경기 변호를 입력해주세요")
+        self.ForRaceDateSelector.set("원하시면 경기 날짜 선택")
+        self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_text, width=40))  # 0
+        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", padx=12.5, command=self.SearchDef))  # 1
         self.SearchObjectsList.append(Button(self.MainWnd, text="불러오기", command=self.LoadDataDef))  # 2
-        self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=50))  # 북마크 3
+        self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=45))  # 북마크 3
+        self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoBack, command=self.TurnToMainScene, width=50, height=45))  # 뒤로가기 4
+        self.SearchObjectsList.append(Button(self.MainWnd, textvariable=self.ForRaceDateSelector, width=40, height=1, command=self.RaceDateSelector))
         self.Datacanvas = Canvas(self.MainWnd, bg='white', width=150, height=300)
         self.Graphcanvas = Canvas(self.MainWnd, bg='white', width=450, height=270)
 
         self.SearchObjectsPlace()
 
     def SearchObjectsPlace(self):
-        self.SearchObjectsList[0].place(x=0, y=50)
-        self.SearchObjectsList[1].place(x=220, y=49)
-        self.SearchObjectsList[2].place(x=260, y=49)
-        self.SearchObjectsList[3].place(x=320, y=30)
+        self.SearchObjectsList[0].place(x=0, y=40)
+        self.SearchObjectsList[1].place(x=300, y=10)
+        self.SearchObjectsList[2].place(x=300, y=35)
+        self.SearchObjectsList[3].place(x=360, y=10)
+        self.SearchObjectsList[4].place(x=420, y=10)
+        self.SearchObjectsList[5].place(x=0, y=10)
         self.Datacanvas.place(x=10, y=90)
         self.Graphcanvas.place(x=10, y=400)
+
+    def RaceDateSelector(self):
+        topWnd = Toplevel(self.MainWnd)
+        topWnd.geometry("320x200+820+100")
+        cal = Calendar(topWnd, selectmode="day", year=2021, month=6)
+        cal.pack()
+        button = Button(topWnd, text="선택 완료", command=partial(self.GetDate, cal, topWnd))
+        button.pack()
+
+        topWnd.title("경기 날짜 선택택")
+
+    def GetDate(self, cal, topWnd):
+        temp = cal.get_date().split('/')
+        if len(temp[0]) == 1:
+            temp[0] = "0"+temp[0]
+        self.ForRaceDateSelector.set("20"+temp[2]+temp[0]+temp[1])
+        topWnd.destroy()
 
     def LoadDataDef(self):
         try:
@@ -125,6 +151,7 @@ class MainGui:
         self.PrintHorseInfo(HorseInfo)
         self.PrintHorsePicture(HorseInfo[3])
         self.PrintBarChart(HorseRaceDate, HorseRaceRound, HorseRaceRank)
+        self.input_text.set("")
 
     def PrintHorseInfo(self, HorseInfo):
         self.Datacanvas.delete("all")
@@ -194,6 +221,8 @@ class MainGui:
         for i in range(len(self.SearchObjectsList)):
             self.SearchObjectsList[i].destroy()
         self.SearchObjectsList.clear()
+        self.Graphcanvas.destroy()
+        self.Datacanvas.destroy()
 
         self.MainSceneButtons()
 

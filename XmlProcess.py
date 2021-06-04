@@ -40,7 +40,7 @@ def SearchHorseRaceResults(InputHorseNum):
         dateList.append('.'.join(i[0].split('-')))
         roundList.append(i[1])
         rankList.append(int(i[6]))
-    return [dateList, roundList,rankList]
+    return [dateList, roundList, rankList]
 
 def ExtractData(XmlStr):
     Tree = ElementTree.fromstring(XmlStr)
