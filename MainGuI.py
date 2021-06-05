@@ -160,7 +160,7 @@ class MainGui:
     def SearchDef(self, InputValue, InputType):
         global HorseInfoForSave
         if InputType == "Search":
-            if InputValue.isalpha():
+            if not InputValue.isdigit():
                 ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
                 HorseInfo = ReturnResult[0]
                 HorseRaceDate = ReturnResult[1][0]
