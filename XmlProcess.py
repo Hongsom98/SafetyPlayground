@@ -21,7 +21,6 @@ def SearchHorseProfile(InputHorseName):
     req = conn.getresponse()
 
     if int(req.status) == 200:
-        print("Xml DownLoad Complete")
         return ExtractData(req.read())
     else:
         print("Xml DownLoad Error")
@@ -35,34 +34,20 @@ def SearchHorseRaceResults(InputHorseNum):
     p = parser.make2d(tables[2])
     del p[0]
     dateList = []
+    roundList = []
     rankList = []
     for i in p:
-        dateList.append(i[0])
+        dateList.append('.'.join(i[0].split('-')))
+        roundList.append(i[1])
         rankList.append(int(i[6]))
-    return [dateList, rankList]
+    return [dateList, roundList, rankList]
 
 def ExtractData(XmlStr):
     Tree = ElementTree.fromstring(XmlStr)
-
     ItemInElements = Tree.iter("item")
 
     Result = []
-    lst = []
 
-    '''for item in ItemInElements:
-        Result["birthday"] = item.find("birthday").text
-        Result["chaksunT"] = item.find("chaksunT").text
-        Result["hrName"] = item.find("hrName").text
-        Result["hrNo"] = item.find("hrNo").text
-        Result["birthplace"] = item.find("name").text
-        Result["rank"] = item.find("rank").text
-        Result["rating"] = item.find("rating").text
-        Result["ord1CntY"] = item.find("ord1CntY").text
-        Result["ord2CntY"] = item.find("ord2CntY").text
-        Result["ord3CntY"] = item.find("ord3CntY").text
-        Result["sex"] = item.find("sex").text
-        Result["trName"] = item.find("trName").text
-        Result["trNo"] = item.find("trNo").text'''
     for item in ItemInElements:
         Result.append(item.find("birthday").text)
         Result.append(item.find("chaksunT").text)
@@ -77,7 +62,7 @@ def ExtractData(XmlStr):
         Result.append(item.find("sex").text)
         Result.append(item.find("trName").text)
         Result.append(item.find("trNo").text)
-    #raceList = SearchHorseRaceResults(Result["hrNo"])
+
     raceList = SearchHorseRaceResults(Result[3])
-    print(raceList)
+
     return [Result, raceList]
