@@ -239,5 +239,11 @@ Thumbs.db
 # profiling data
 .prof
 
+__pycache__/
+blob_storage/
+VideoDecodeStats/
+webrtc_event_logs/
+.idea/
+.ipynb_checkpoints/
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,python

@@ -14,6 +14,7 @@ from functools import partial
 
 host = "smtp.gmail.com"
 port = "587"
+global HorseInfoForSave
 
 def Button_Namuwiki_Link():
     webbrowser.open("https://namu.wiki/w/%EA%B2%BD%EB%A7%88")
@@ -80,7 +81,7 @@ class MainGui:
         self.SearchObjectsList.append(Button(self.MainWnd, text="불러오기", command=self.LoadDataDef))  # 2
         self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=45))  # 북마크 3
         self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoBack, command=self.TurnToMainScene, width=50, height=45))  # 뒤로가기 4
-        self.SearchObjectsList.append(Button(self.MainWnd, textvariable=self.ForRaceDateSelector, width=40, height=1, command=self.RaceDateSelector))
+        self.SearchObjectsList.append(Button(self.MainWnd, textvariable=self.ForRaceDateSelector, width=40, height=1, command=self.RaceDateSelector)) # 달력 5
         self.Datacanvas = Canvas(self.MainWnd, bg='white', width=150, height=300)
         self.Graphcanvas = Canvas(self.MainWnd, bg='white', width=450, height=270)
 
@@ -123,15 +124,20 @@ class MainGui:
             pass
 
     def Favorite(self):
-        self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite, width=50, height=50)
-        Result = XmlProcess.SearchHorseProfile(self.input_text.get())
-        self.FavList.append(Result)
+        self.SearchObjectsList[3].destroy()
+        global HorseInfoForSave
+        if HorseInfoForSave in self.FavList:
+            self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=50)
+            self.FavList.remove(HorseInfoForSave)
+        else:
+            self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite, width=50, height=50)
+            self.FavList.append(HorseInfoForSave)
         with open('bookmark', 'wb') as f:
-            pickle.dump(Result, f)
+            pickle.dump(self.FavList, f)
+        self.SearchObjectsList[3].place(x=360, y=10)
 
     def ShowRaceVideo(self, RaceDate, RaceRound):
         keyword = self.SelectRocation + " 20" + RaceDate + " " + RaceRound + "경주"
-        print(keyword)
         videoSearch = VideosSearch(keyword, limit=10)
 
         result = videoSearch.result()
@@ -147,6 +153,8 @@ class MainGui:
         HorseRaceDate = ReturnResult[1][0]
         HorseRaceRound = ReturnResult[1][1]
         HorseRaceRank = ReturnResult[1][2]
+        global HorseInfoForSave
+        HorseInfoForSave = HorseInfo
 
         self.PrintHorseInfo(HorseInfo)
         self.PrintHorsePicture(HorseInfo[3])
