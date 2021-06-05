@@ -11,6 +11,7 @@ import sys
 from cefpython3 import cefpython as cef
 from youtubesearchpython import *
 from functools import partial
+import Gif
 #-*- coding:utf-8 -*-
 
 host = "smtp.gmail.com"
@@ -25,6 +26,7 @@ class MainGui:
         self.MainWnd = Tk()
         self.MainWnd.title("SafetyPlayGround")
         self.MainWnd.geometry("480x680+660+240")
+        self.MainWnd.configure(bg="RoyalBlue4")
         self.senderAddress = 'gksduddls33@gmail.com'
         self.passwd = 'brownie9065!@'
 
@@ -38,7 +40,9 @@ class MainGui:
         self.photoNamuwiki = PhotoImage(file="Photo/Namuwiki_icon.png")
         self.photoWhiteStar = PhotoImage(file="Photo/book_mark_off.png")
         self.photoYellowStar = PhotoImage(file="Photo/book_mark_on.png")
+        self.photoTitle = PhotoImage(file="Photo/dae mun.png")
         self.photoBack = PhotoImage(file="Photo/Back_icon.png")
+        self.photoPredict = PhotoImage(file="Photo/predict.png")
         self.input_text = StringVar()
         self.ForRaceDateSelector = StringVar()
         self.FavList = []
@@ -65,16 +69,23 @@ class MainGui:
         self.MainObjectList.append(Button(self.MainWnd, image=self.photoGmail, borderwidth=0, command=self.ButtonGmailSend))
         self.MainObjectList.append(Button(self.MainWnd, image=self.photoTelegram, borderwidth=0, command=self.ButtonTelegramSend))
         self.MainObjectList.append(Button(self.MainWnd, image=self.photoNamuwiki, borderwidth=0, command=Button_Namuwiki_Link))
+        self.MainObjectList.append(Label(self.MainWnd, image=self.photoTitle, borderwidth=0))
+        self.MainObjectList.append(Button(self.MainWnd, image=self.photoPredict, borderwidth=0,command=self.ButtonPredict))
+        self.lbl = Gif.ImageLabel(self.MainWnd)
+        self.lbl.load('Photo/11.gif')
 
         self.MainScenePlace()
 
     def MainScenePlace(self):
-        self.MainObjectList[0].place(x=200, y=50)
-        self.MainObjectList[1].place(x=200, y=200)
-        self.MainObjectList[2].place(x=200, y=350)
+        self.MainObjectList[0].place(x=30, y=210)
+        self.MainObjectList[1].place(x=200, y=210)
+        self.MainObjectList[2].place(x=380, y=210)
         self.MainObjectList[3].place(x=0, y=580)
         self.MainObjectList[4].place(x=380, y=580)
         self.MainObjectList[5].place(x=190, y=580)
+        self.MainObjectList[6].place(x=0, y=0)
+        self.MainObjectList[7].place(x=160, y=350)
+        self.lbl.place(x=0, y=500)
 
     def SetSearchButtons(self):
         self.input_text.set("마명이나 원하는 경기 변호를 입력해주세요")
@@ -159,9 +170,11 @@ class MainGui:
         cef.MessageLoop()
 
     def SearchDef(self, InputValue, InputType):
+        t = ["1","2","3","4","5","6","7","8","9","10"]
+        print(InputValue)
         global HorseInfoForSave
         if InputType == "Search":
-            if not InputValue.isdigit():
+            if not self.input_text.get() in t:
                 ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
                 HorseInfo = ReturnResult[0]
                 HorseRaceDate = ReturnResult[1][0]
@@ -369,6 +382,8 @@ class MainGui:
         s.close()
         TopLv.destroy()
     def ButtonTelegramSend(self):
+        pass
+    def ButtonPredict(self):
         pass
 
 
