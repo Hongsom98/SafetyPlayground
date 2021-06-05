@@ -50,6 +50,8 @@ class MainGui:
         self.msgtext = None
 
         self.HorsePicture = None
+        self.nHorseList = None
+        self.nHorseButtons = []
 
         self.MainSceneButtons()
         self.MainWnd.mainloop()
@@ -77,7 +79,7 @@ class MainGui:
         self.input_text.set("마명이나 원하는 경기 변호를 입력해주세요")
         self.ForRaceDateSelector.set("원하시면 경기 날짜 선택")
         self.SearchObjectsList.append(Entry(self.MainWnd, textvariable=self.input_text, width=40))  # 0
-        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", padx=12.5, command=self.SearchDef))  # 1
+        self.SearchObjectsList.append(Button(self.MainWnd, text="검색", padx=12.5, command=partial(self.SearchDef, self.input_text.get(), "Search")))  # 1
         self.SearchObjectsList.append(Button(self.MainWnd, text="불러오기", command=self.LoadDataDef))  # 2
         self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=45))  # 북마크 3
         self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoBack, command=self.TurnToMainScene, width=50, height=45))  # 뒤로가기 4
@@ -105,13 +107,18 @@ class MainGui:
         button = Button(topWnd, text="선택 완료", command=partial(self.GetDate, cal, topWnd))
         button.pack()
 
-        topWnd.title("경기 날짜 선택택")
+        topWnd.title("경기 날짜 선택")
 
     def GetDate(self, cal, topWnd):
         temp = cal.get_date().split('/')
         if len(temp[0]) == 1:
             temp[0] = "0" + temp[0]
+        if len(temp[1]) == 1:
+            temp[1] = "0" + temp[1]
         self.ForRaceDateSelector.set("20" + temp[2] + temp[0] + temp[1])
+        temp = XmlProcess.DoSearchWithRaceRound(self.ForRaceDateSelector.get())
+
+        self.input_text.set(self.ForRaceDateSelector.get() + "에는 1~" + str(temp) + "경기가 있습니다")
         topWnd.destroy()
 
     def LoadDataDef(self):
@@ -150,19 +157,58 @@ class MainGui:
         cef.CreateBrowserSync(url=result['result'][0]['link'], window_title="경마 시청")
         cef.MessageLoop()
 
-    def SearchDef(self):
-        ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
-        HorseInfo = ReturnResult[0]
-        HorseRaceDate = ReturnResult[1][0]
-        HorseRaceRound = ReturnResult[1][1]
-        HorseRaceRank = ReturnResult[1][2]
+    def SearchDef(self, InputValue, InputType):
         global HorseInfoForSave
-        HorseInfoForSave = HorseInfo
+        if InputType == "Search":
+            if InputValue.isalpha():
+                ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
+                HorseInfo = ReturnResult[0]
+                HorseRaceDate = ReturnResult[1][0]
+                HorseRaceRound = ReturnResult[1][1]
+                HorseRaceRank = ReturnResult[1][2]
+                HorseInfoForSave = HorseInfo
 
-        self.PrintHorseInfo(HorseInfo)
-        self.PrintHorsePicture(HorseInfo[3])
-        self.PrintBarChart(HorseRaceDate, HorseRaceRound, HorseRaceRank)
-        self.input_text.set("")
+                self.PrintHorseInfo(HorseInfo)
+                self.PrintHorsePicture(HorseInfo[3])
+                self.PrintBarChart(HorseRaceDate, HorseRaceRound, HorseRaceRank)
+                self.input_text.set("")
+            else:
+                for i in range(len(self.nHorseButtons)):
+                    self.nHorseButtons[i].destroy()
+                self.nHorseButtons.clear()
+                self.nHorseList = XmlProcess.MakeNHorseList(self.ForRaceDateSelector.get(), self.input_text.get())
+                for i in range(len(self.nHorseList)):
+                    self.nHorseButtons.append(Button(self.MainWnd, text=str(i+1)+'번 경주마', padx=10, width=15, borderwidth=0, background='white', command=partial(self.SearchDef, self.nHorseList[i], "nHorse")))
+                    self.nHorseButtons[i].place(x=10, y=90+i*20)
+        else:
+            for i in range(len(self.nHorseButtons)):
+                self.nHorseButtons[i].place(x=-200, y=90+i*20)
+            self.nHorseButtons.append(Button(self.MainWnd, text="뒤로가기", command=self.BackNHorseList, borderwidth=0, background='white'))
+            self.nHorseButtons[-1].place(x=20, y=340)
+            ReturnResult = XmlProcess.SearchHorseProfile(InputValue)
+            HorseInfo = ReturnResult[0]
+            HorseRaceDate = ReturnResult[1][0]
+            HorseRaceRound = ReturnResult[1][1]
+            HorseRaceRank = ReturnResult[1][2]
+            HorseInfoForSave = HorseInfo
+
+            self.PrintHorseInfo(HorseInfo)
+            self.PrintHorsePicture(HorseInfo[3])
+            self.PrintBarChart(HorseRaceDate, HorseRaceRound, HorseRaceRank)
+            self.input_text.set("")
+
+    def BackNHorseList(self):
+        self.Datacanvas.delete("all")
+        if self.HorsePicture is not None:
+            self.HorsePicture.destroy()
+        self.Graphcanvas.delete("all")
+        for i in range(len(self.RaceDateButtonList)):
+            self.RaceDateButtonList[i].destroy()
+        self.RaceDateButtonList.clear()
+        for i in range(len(self.nHorseList)):
+            self.nHorseButtons[i].place(x=10, y=90 + i * 20)
+        self.nHorseButtons[-1].destroy()
+        del self.nHorseButtons[-1]
 
     def PrintHorseInfo(self, HorseInfo):
         self.Datacanvas.delete("all")
@@ -187,8 +233,13 @@ class MainGui:
         urlFirst = 'https://studbook.kra.co.kr/h_photo/'
         url = urlFirst + HorseNum[:3] + '/' + HorseNum + '-l.jpg'
 
-        with urllib.request.urlopen(url) as u:
-            raw_data = u.read()
+        try:
+            with urllib.request.urlopen(url) as u:
+                raw_data = u.read()
+        except:
+            with urllib.request.urlopen("https://studbook.kra.co.kr/servlet/ImageResizer?file=/h_photo/040/040827-l.JPG&width=210&height=142") as u:
+                raw_data = u.read()
+
         im = Image.open(BytesIO(raw_data))
         im = im.resize((300, 300))
         image = ImageTk.PhotoImage(im)
@@ -203,23 +254,21 @@ class MainGui:
         x_stretch = 50
         x_width = 30
         x_gap = 40
-        cnt = 0
         self.Graphcanvas.delete("all")
         for i in range(len(self.RaceDateButtonList)):
             self.RaceDateButtonList[i].destroy()
         self.RaceDateButtonList.clear()
-        for i in RaceRank:
-            if cnt > 4:
+        for x, i in enumerate(RaceRank):
+            if x > 4:
                 break
-            x0 = cnt * x_stretch + cnt * x_width + x_gap
+            x0 = x * x_stretch + x * x_width + x_gap
             y0 = 270 - ((15 - i) * y_stretch + y_gap)
-            x1 = cnt * x_stretch + cnt * x_width + x_width + x_gap
+            x1 = x * x_stretch + x * x_width + x_width + x_gap
             y1 = 270 - y_gap
             self.Graphcanvas.create_rectangle(x0, y0, x1, y1, fill="#020721", outline='yellow')
             self.Graphcanvas.create_text(x0 + 7, y0, anchor=SW, text=str(i) + "등")
-            self.RaceDateButtonList.append(Button(self.MainWnd, text=RaceDate[cnt], borderwidth=0, background='white', command=partial(self.ShowRaceVideo, RaceDate[cnt], RaceRound[cnt])))
-            self.RaceDateButtonList[cnt].place(x=x0 - 2, y=y1 + 400)
-            cnt += 1
+            self.RaceDateButtonList.append(Button(self.MainWnd, text=RaceDate[x], borderwidth=0, background='white', command=partial(self.ShowRaceVideo, RaceDate[x], RaceRound[x])))
+            self.RaceDateButtonList[x].place(x=x0 - 2, y=y1 + 400)
 
     def TurnToSearchScene(self):
         for i in range(len(self.MainObjectList)):

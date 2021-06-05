@@ -12,6 +12,35 @@ DataPotal = "apis.data.go.kr"
 def InitSettings():
     pass
 
+def DoSearchWithRaceRound(InputDate):
+    Fronturl = "/B551015/API26/entrySheet?serviceKey="
+    conn = http.client.HTTPConnection(DataPotal)
+
+    conn.request("GET", Fronturl+ServiceKey+"&pageNo=1&numOfRows=500&meet=1&rc_date=" + InputDate + "&rc_month=" + InputDate[:6])
+    req = conn.getresponse()
+
+    if int(req.status) == 200:
+        Tree = ElementTree.fromstring(req.read())
+        ItemInElements = Tree.iter("item")
+        rcNo = 0
+        for item in ItemInElements:
+            rcNo = item.find("rcNo").text
+        return rcNo
+    else:
+        print("Xml DownLoad Error")
+
+def MakeNHorseList(rcDate, rcRound):
+    url = "http://race.kra.co.kr/raceScore/ScoretableDetailList.do?meet=1&realRcDate=" + str(rcDate) + "&realRcNo=" + str(rcRound)
+    result = urlopen(url)
+    html = result.read()
+    soup = BeautifulSoup(html, 'html.parser')
+    temp = soup.find_all('table')
+    p = parser.make2d(temp[2])
+    del p[0]
+    for i in range(len(p)):
+        p[i] = p[i][2]
+    return p
+
 def SearchHorseProfile(InputHorseName):
     FrontUrl = "/B551015/API8/raceHorseInfo?ServiceKey="
     conn = http.client.HTTPConnection(DataPotal)
