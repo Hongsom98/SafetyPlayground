@@ -11,6 +11,7 @@ import sys
 from cefpython3 import cefpython as cef
 from youtubesearchpython import *
 from functools import partial
+#-*- coding:utf-8 -*-
 
 host = "smtp.gmail.com"
 port = "587"
@@ -168,6 +169,16 @@ class MainGui:
                 HorseRaceRank = ReturnResult[1][2]
                 HorseInfoForSave = HorseInfo
 
+                self.SearchObjectsList[3].destroy()
+                if HorseInfoForSave in self.FavList:
+                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite,
+                                                       width=50,
+                                                       height=50)
+                else:
+                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite,
+                                                       width=50, height=50)
+                self.SearchObjectsList[3].place(x=360, y=10)
+
                 self.PrintHorseInfo(HorseInfo)
                 self.PrintHorsePicture(HorseInfo[3])
                 self.PrintBarChart(HorseRaceDate, HorseRaceRound, HorseRaceRank)
@@ -304,7 +315,7 @@ class MainGui:
     def ButtonGmailSend(self):
         global host, port
         MsgTopLevel = Toplevel(self.MainWnd)
-        MsgTopLevel.geometry("320x200+820+100")
+        MsgTopLevel.geometry("200x100")
         MsgTopLevel.title("메일 보내기")
 
         # html = ""
@@ -322,10 +333,11 @@ class MainGui:
 
         Label(MsgTopLevel, text="내용 :").place(x=0, y=40)
         Entry(MsgTopLevel, textvariable=self.msgtext, width=20).place(x=40, y=40)
+        chkBox = IntVar()
+        Checkbutton(MsgTopLevel, text="예측 보내기", variable=chkBox).place(x=00,y=60)
+        Button(MsgTopLevel, text="발송", command=partial(self.ButtonSend, MsgTopLevel, chkBox)).place(x=150, y=60)
 
-        Button(MsgTopLevel, text="발송", command=self.ButtonSend).place(x=100, y=80)
-
-    def ButtonSend(self):
+    def ButtonSend(self, TopLv, chkBox):
         import mysmtplib
 
         from email.mime.multipart import MIMEMultipart
@@ -338,8 +350,14 @@ class MainGui:
         msg['To'] = self.recipientAddr.get()
 
         msgPart = MIMEText(self.msgtext.get(), 'plain')
-
         msg.attach(msgPart)
+
+        if chkBox :
+            infile = open("testTXT.txt" , "r", encoding='utf-8')
+            SndTXT = infile.read()
+            msgPredict = MIMEText(SndTXT,'plain')
+            msg.attach(msgPredict)
+
 
         s = mysmtplib.MySMTP(host, port)
 
@@ -349,7 +367,7 @@ class MainGui:
         s.login(self.senderAddress, self.passwd)
         s.sendmail(self.senderAddress, [self.recipientAddr.get()], msg.as_string())
         s.close()
-
+        TopLv.destroy()
     def ButtonTelegramSend(self):
         pass
 
