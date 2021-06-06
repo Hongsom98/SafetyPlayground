@@ -72,7 +72,7 @@ class MainGui:
         self.MainObjectList.append(Label(self.MainWnd, image=self.photoTitle, borderwidth=0))
         self.MainObjectList.append(Button(self.MainWnd, image=self.photoPredict, borderwidth=0,command=self.ButtonPredict))
         self.lbl = Gif.ImageLabel(self.MainWnd)
-        self.lbl.load('Photo/11.gif')
+        # self.lbl.load('Photo/11.gif')
 
         self.MainScenePlace()
 
@@ -170,11 +170,9 @@ class MainGui:
         cef.MessageLoop()
 
     def SearchDef(self, InputValue, InputType):
-        t = ["1","2","3","4","5","6","7","8","9","10"]
-        print(InputValue)
         global HorseInfoForSave
         if InputType == "Search":
-            if not self.input_text.get() in t:
+            if self.input_text.get().isalpha():
                 ReturnResult = XmlProcess.SearchHorseProfile(self.input_text.get())
                 HorseInfo = ReturnResult[0]
                 HorseRaceDate = ReturnResult[1][0]
@@ -184,12 +182,9 @@ class MainGui:
 
                 self.SearchObjectsList[3].destroy()
                 if HorseInfoForSave in self.FavList:
-                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite,
-                                                       width=50,
-                                                       height=50)
+                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite, width=50, height=50)
                 else:
-                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite,
-                                                       width=50, height=50)
+                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=50)
                 self.SearchObjectsList[3].place(x=360, y=10)
 
                 self.PrintHorseInfo(HorseInfo)
@@ -197,6 +192,10 @@ class MainGui:
                 self.PrintBarChart(HorseRaceDate, HorseRaceRound, HorseRaceRank)
                 self.input_text.set("")
             else:
+                self.Datacanvas.delete("all")
+                self.Graphcanvas.delete("all")
+                if self.HorsePicture is not None:
+                    self.HorsePicture.destroy()
                 for i in range(len(self.nHorseButtons)):
                     self.nHorseButtons[i].destroy()
                 self.nHorseButtons.clear()
@@ -381,8 +380,10 @@ class MainGui:
         s.sendmail(self.senderAddress, [self.recipientAddr.get()], msg.as_string())
         s.close()
         TopLv.destroy()
+
     def ButtonTelegramSend(self):
         pass
+
     def ButtonPredict(self):
         pass
 
