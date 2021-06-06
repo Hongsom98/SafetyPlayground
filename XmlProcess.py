@@ -1,6 +1,8 @@
 import urllib
 import http.client
 from urllib.request import urlopen
+
+import pandas as pd
 from bs4 import BeautifulSoup
 from html_table_parser import parser_functions as parser
 from xml.etree import ElementTree
@@ -95,3 +97,67 @@ def ExtractData(XmlStr):
     raceList = SearchHorseRaceResults(Result[3])
 
     return [Result, raceList]
+
+def ForPredictDate():
+    """
+    url = "https://race.kra.co.kr/chulmainfo/RegistStateList.do?Act=02&Sub=6&meet=1"
+    result = urlopen(url)
+    html = result.read()
+    soup = BeautifulSoup(html, "html.parser")
+    tables = soup.find_all('table')
+    p = parser.make2d(tables[0])
+    del p[0]
+    return p[-1][1]
+    """
+
+    import datetime
+
+    today = datetime.datetime.now().strftime("%Y%m%d")
+    print(today, type(today))
+
+    while True:
+        temp = pd.Timestamp(today).day_name()
+        print(temp)
+        if temp == "Saturday" or temp == "Sunday":
+            return today
+        today = str(int(today)+1)
+
+def TakeListToPredict():
+    DateToPredict = ForPredictDate()
+    CharToDelete = "/(토)일"
+    for x in range(len(CharToDelete)):
+        DateToPredict = DateToPredict.replace(CharToDelete[x], "")
+
+    TakeDataToPredict(DateToPredict)
+    DateToPredict = str(int(DateToPredict)+1)
+    TakeDataToPredict(DateToPredict)
+
+
+def TakeDataToPredict(DateToPredict):
+    pgCnt = 1
+    while True:
+        if pgCnt > 15:
+            break
+
+        url = "https://race.kra.co.kr/chulmainfo/registStateRegistList.do?meet=1&date=" + DateToPredict + "&pgNo=" + str(pgCnt)
+        result = urlopen(url)
+        html = result.read()
+        soup = BeautifulSoup(html, 'html.parser')
+        temp = soup.find_all("table")
+        p = parser.make2d(temp[2])
+        del p[0]
+
+        if p[0][0] == "자료가 없습니다.":
+            pgCnt += 1
+            continue
+
+        WillPredict = []
+        for i in p:
+            WillPredict.append([i[0], i[5], i[6]])
+        print(url)
+        print(WillPredict)
+        pgCnt += 1
+
+
+
+TakeListToPredict()
