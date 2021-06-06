@@ -25,7 +25,7 @@ class MainGui:
     def __init__(self):
         self.MainWnd = Tk()
         self.MainWnd.title("SafetyPlayGround")
-        self.MainWnd.geometry("480x680+660+240")
+        self.MainWnd.geometry("480x815+660+240")
         self.MainWnd.configure(bg="RoyalBlue4")
         self.senderAddress = 'gksduddls33@gmail.com'
         self.passwd = 'brownie9065!@'
@@ -72,8 +72,9 @@ class MainGui:
         self.MainObjectList.append(Label(self.MainWnd, image=self.photoTitle, borderwidth=0))
         self.MainObjectList.append(Button(self.MainWnd, image=self.photoPredict, borderwidth=0,command=self.ButtonPredict))
         self.lbl = Gif.ImageLabel(self.MainWnd)
-        # self.lbl.load('Photo/11.gif')
-
+        self.lbl.load('Photo/Hani.gif')
+        self.lbr = Gif.ImageLabel(self.MainWnd)
+        self.lbr.load('Photo/horseRight.gif')
         self.MainScenePlace()
 
     def MainScenePlace(self):
@@ -85,8 +86,8 @@ class MainGui:
         self.MainObjectList[5].place(x=190, y=580)
         self.MainObjectList[6].place(x=0, y=0)
         self.MainObjectList[7].place(x=160, y=350)
-        self.lbl.place(x=0, y=500)
-
+        self.lbl.place(x=0, y=680)
+        self.lbr.place(x=240, y=680)
     def SetSearchButtons(self):
         self.input_text.set("마명이나 원하는 경기 변호를 입력해주세요")
         self.ForRaceDateSelector.set("원하시면 경기 날짜 선택")
