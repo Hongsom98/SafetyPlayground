@@ -55,11 +55,11 @@ def Predict():
     for i in range(len(d)):
         temp = list(d.loc[i])
         if temp[4]:
-            temp.append("거")
+            temp.append("C")
         elif temp[5]:
-            temp.append("수")
+            temp.append("M")
         elif temp[6]:
-            temp.append("암")
+            temp.append("F")
         del temp[4:7]
         PredictList.append(temp)
 
@@ -69,3 +69,4 @@ def Predict():
                 f.write(str(i)+" ")
             f.write('\n')
 
+Predict()

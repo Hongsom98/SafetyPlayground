@@ -126,9 +126,18 @@ def TakeListToPredict():
     for x in range(len(CharToDelete)):
         DateToPredict = DateToPredict.replace(CharToDelete[x], "")
 
-    TakeDataToPredict(DateToPredict)
-    DateToPredict = str(int(DateToPredict)+1)
-    TakeDataToPredict(DateToPredict)
+    ToPredictSet = TakeDataToPredict(DateToPredict)
+    for i in range(len(ToPredictSet)):
+        if ToPredictSet[i][1] == '거':
+            ToPredictSet[i][1] = 'C'
+        elif ToPredictSet[i][1] == '수':
+            ToPredictSet[i][1] = 'M'
+        elif ToPredictSet[i][1] == '암':
+            ToPredictSet[i][1] = 'F'
+
+    import GetLucky
+
+    print(GetLucky.GetLuckyNumber(int(ToPredictSet[0][0]), ToPredictSet[0][1], int(ToPredictSet[0][2])))
 
 
 def TakeDataToPredict(DateToPredict):
@@ -154,8 +163,7 @@ def TakeDataToPredict(DateToPredict):
             WillPredict.append([i[0], i[5], i[6]])
         pgCnt += 1
 
-    with open('ToPredict.txt', 'w') as f:
-        for item in WillPredict:
-            for i in item:
-                f.write(str(i) + " ")
-            f.write('\n')
+    return WillPredict
+
+
+TakeListToPredict()
