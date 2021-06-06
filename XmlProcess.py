@@ -113,18 +113,16 @@ def ForPredictDate():
     import datetime
 
     today = datetime.datetime.now().strftime("%Y%m%d")
-    print(today, type(today))
 
     while True:
         temp = pd.Timestamp(today).day_name()
-        print(temp)
         if temp == "Saturday" or temp == "Sunday":
             return today
         today = str(int(today)+1)
 
 def TakeListToPredict():
     DateToPredict = ForPredictDate()
-    CharToDelete = "/(토)일"
+    CharToDelete = "/()토일"
     for x in range(len(CharToDelete)):
         DateToPredict = DateToPredict.replace(CharToDelete[x], "")
 
@@ -135,6 +133,7 @@ def TakeListToPredict():
 
 def TakeDataToPredict(DateToPredict):
     pgCnt = 1
+    WillPredict = []
     while True:
         if pgCnt > 15:
             break
@@ -151,13 +150,12 @@ def TakeDataToPredict(DateToPredict):
             pgCnt += 1
             continue
 
-        WillPredict = []
         for i in p:
             WillPredict.append([i[0], i[5], i[6]])
-        print(url)
-        print(WillPredict)
         pgCnt += 1
 
-
-
-TakeListToPredict()
+    with open('ToPredict.txt', 'w') as f:
+        for item in WillPredict:
+            for i in item:
+                f.write(str(i) + " ")
+            f.write('\n')
