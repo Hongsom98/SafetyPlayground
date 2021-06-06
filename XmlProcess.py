@@ -56,6 +56,25 @@ def SearchHorseProfile(InputHorseName):
     else:
         print("Xml DownLoad Error")
 
+def SearchHorseProfile(InputHorseName, region):
+    if region == "서울":
+        SearchLegion = "1"
+    elif region == "부경":
+        SearchLegion = "2"
+    else:
+        SearchLegion = "3"
+    FrontUrl = "/B551015/API8/raceHorseInfo?ServiceKey="
+    conn = http.client.HTTPConnection(DataPotal)
+    HorseName = urllib.parse.quote(InputHorseName)
+
+    conn.request("GET", FrontUrl+ServiceKey+"&pageNo=1&numOfRows=10&hr_name="+HorseName+"&meet="+SearchLegion)
+    req = conn.getresponse()
+
+    if int(req.status) == 200:
+        return ExtractData(req.read())
+    else:
+        print("Xml DownLoad Error")
+
 def SearchHorseRaceResults(InputHorseNum):
     url = "https://studbook.kra.co.kr/html/info/ind/s_race_result.jsp?mabun=" + InputHorseNum
     result = urlopen(url)

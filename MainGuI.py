@@ -389,7 +389,8 @@ class MainGui:
 
         bot = telepot.Bot('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
         updater = Updater('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
-        user = 1842607039
+
+        user = None
         msg = '안녕하세요 영인이네 안전놀이터입니다\n'
         msg += '''경기 일★정 조회
 
@@ -413,9 +414,6 @@ class MainGui:
             SndTXT = infile.read()
             bot.sendMessage(user, text= SndTXT)
 
-        def add_handler(cmd, func):
-            updater.dispatcher.add_handler(CommandHandler(cmd, func))
-
         def handle(msg):
             content_type, chat_type, user = telepot.glance(msg)
             if content_type != 'text':
@@ -425,14 +423,12 @@ class MainGui:
             args = text.split(' ')
 
             if text.startswith('경마') and len(args) > 1:
-                print(args[1])
-                HorseInfo = XmlProcess.SearchHorseProfile(args[1])
-                msgInfo = "생년월일:" + HorseInfo[0] + "\n통산착순상금:" + HorseInfo[1] +"\n이름:" + HorseInfo[2]
-                + "\n마번:" + HorseInfo[0][3] + "\n출생지:" + HorseInfo[0][4] + "\n등급:" + HorseInfo[0][5] + "\n레이팅:" + HorseInfo[0][6]
-                + "\n1년1착횟수:" + HorseInfo[0][7] + "\n2년1착횟수:" + HorseInfo[0][8] + "\n3년1착횟수:" + HorseInfo[0][9]
-                +"\n성별:" + HorseInfo[0][10] +  "\n조교사:" + HorseInfo[0][11] + "\n조교사번호:" + HorseInfo[0][12]
+                region = args[1]
+                data = str(args[2])
+                HorseInfo = XmlProcess.SearchHorseProfile(data, region)
+                msgInfo = "생년월일:" + HorseInfo[0][0] + "\n통산착순상금:" + HorseInfo[0][1] +"\n이름:" + HorseInfo[0][2] + "\n마번:" + HorseInfo[0][3] + "\n출생지:" + HorseInfo[0][4] + "\n등급:" + HorseInfo[0][5] + "\n레이팅:" + HorseInfo[0][6] + "\n1년1착횟수:" + HorseInfo[0][7] + "\n2년1착횟수:" + HorseInfo[0][8] + "\n3년1착횟수:" + HorseInfo[0][9] +"\n성별:" + HorseInfo[0][10] +  "\n조교사:" + HorseInfo[0][11] + "\n조교사번호:" + HorseInfo[0][12]
                 sendMessage(user, msgInfo)
-                pass
+
             elif text.startswith('즐찾') :
                 with open('bookmark', 'rb') as f:
                     lst = pickle.load(f)
@@ -441,13 +437,10 @@ class MainGui:
             elif text.startswith('예측') :
                 send_Predict()
             else:
-                sendMessage(user, '모르는 명령어입니다.\n 마명 [말이름], 예측 중 하나의 명령어를 입력하세요')
+                sendMessage(user, '모르는 명령어입니다.\n 마명 [장소] [말이름], 예측 중 하나의 명령어를 입력하세요')
 
-
-        add_handler('pred',send_Predict)
         bot.message_loop(handle)
 
-        bot.sendMessage(user,msg)
         pass
 
     def ButtonPredict(self):
