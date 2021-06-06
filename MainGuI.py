@@ -12,6 +12,9 @@ from cefpython3 import cefpython as cef
 from youtubesearchpython import *
 from functools import partial
 import Gif
+import telepot
+from telegram.ext import Updater
+from telegram.ext import CommandHandler
 #-*- coding:utf-8 -*-
 
 host = "smtp.gmail.com"
@@ -383,6 +386,61 @@ class MainGui:
         TopLv.destroy()
 
     def ButtonTelegramSend(self):
+
+        bot = telepot.Bot('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
+        updater = Updater('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
+
+        user = None
+        msg = '안녕하세요 영인이네 안전놀이터입니다\n'
+        msg += '''경기 일★정 조회
+
+§§경주마 정보/성적 조회§§
+
+♜경기 영상 링크♜
+
+관심 경주마 저장/관련 정보 연동
+
+※다음 경기 예측 무료 제공￥
+'''
+
+        def sendMessage(user, msg):
+            try:
+                bot.sendMessage(user, msg)
+            except:
+                traceback.print_exc(file=sys.stdout)
+
+        def send_Predict():
+            infile = open("testTXT.txt", "r", encoding='utf-8')
+            SndTXT = infile.read()
+            bot.sendMessage(user, text= SndTXT)
+
+        def handle(msg):
+            content_type, chat_type, user = telepot.glance(msg)
+            if content_type != 'text':
+                sendMessage(user, '난 텍스트 이외의 메시지는 처리하지 못해요.')
+                return
+            text = msg['text']
+            args = text.split(' ')
+
+            if text.startswith('경마') and len(args) > 1:
+                region = args[1]
+                data = str(args[2])
+                HorseInfo = XmlProcess.SearchHorseProfile(data, region)
+                msgInfo = "생년월일:" + HorseInfo[0][0] + "\n통산착순상금:" + HorseInfo[0][1] +"\n이름:" + HorseInfo[0][2] + "\n마번:" + HorseInfo[0][3] + "\n출생지:" + HorseInfo[0][4] + "\n등급:" + HorseInfo[0][5] + "\n레이팅:" + HorseInfo[0][6] + "\n1년1착횟수:" + HorseInfo[0][7] + "\n2년1착횟수:" + HorseInfo[0][8] + "\n3년1착횟수:" + HorseInfo[0][9] +"\n성별:" + HorseInfo[0][10] +  "\n조교사:" + HorseInfo[0][11] + "\n조교사번호:" + HorseInfo[0][12]
+                sendMessage(user, msgInfo)
+
+            elif text.startswith('즐찾') :
+                with open('bookmark', 'rb') as f:
+                    lst = pickle.load(f)
+                for i in lst:
+                    sendMessage(user, i)
+            elif text.startswith('예측') :
+                send_Predict()
+            else:
+                sendMessage(user, '모르는 명령어입니다.\n 마명 [장소] [말이름], 예측 중 하나의 명령어를 입력하세요')
+
+        bot.message_loop(handle)
+
         pass
 
     def ButtonPredict(self):
