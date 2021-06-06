@@ -414,10 +414,10 @@ class MainGui:
             except:
                 traceback.print_exc(file=sys.stdout)
 
-        def send_Predict():
+        def send_Predict(user):
             infile = open("testTXT.txt", "r", encoding='utf-8')
             SndTXT = infile.read()
-            bot.sendMessage(user, text=SndTXT)
+            sendMessage(user, SndTXT)
 
         def handle(msg):
             content_type, chat_type, user = telepot.glance(msg)
@@ -441,10 +441,16 @@ class MainGui:
             elif text.startswith('즐찾'):
                 with open('bookmark', 'rb') as f:
                     lst = pickle.load(f)
+
                 for i in lst:
-                    sendMessage(user, i)
+                    msg = "생년월일:" + i[0] + "\n통산착순상금:" + i[1] + "\n이름:" + i[2] + \
+                              "\n마번:" + i[3] + "\n출생지:" + i[4] + "\n등급:" + i[5] + \
+                              "\n레이팅:" + i[6] + "\n1년1착횟수:" + i[7] + "\n2년1착횟수:" + i[8] + \
+                              "\n3년1착횟수:" + i[9] + "\n성별:" + i[10] + "\n조교사:" + \
+                              i[11] + "\n조교사번호:" + i[12]
+                    sendMessage(user, msg)
             elif text.startswith('예측'):
-                send_Predict()
+                send_Predict(user)
             else:
                 sendMessage(user, '모르는 명령어입니다.\n 마명 [장소] [말이름], 예측 중 하나의 명령어를 입력하세요')
 
