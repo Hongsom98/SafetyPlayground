@@ -1,3 +1,4 @@
+import traceback
 from tkinter import *
 from tkcalendar import *
 import webbrowser
@@ -15,14 +16,17 @@ import Gif
 import telepot
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
-#-*- coding:utf-8 -*-
+
+# -*- coding:utf-8 -*-
 
 host = "smtp.gmail.com"
 port = "587"
 HorseInfoForSave = None
 
+
 def Button_Namuwiki_Link():
     webbrowser.open("https://namu.wiki/w/%EA%B2%BD%EB%A7%88")
+
 
 class MainGui:
     def __init__(self):
@@ -73,7 +77,7 @@ class MainGui:
         self.MainObjectList.append(Button(self.MainWnd, image=self.photoTelegram, borderwidth=0, command=self.ButtonTelegramSend))
         self.MainObjectList.append(Button(self.MainWnd, image=self.photoNamuwiki, borderwidth=0, command=Button_Namuwiki_Link))
         self.MainObjectList.append(Label(self.MainWnd, image=self.photoTitle, borderwidth=0))
-        self.MainObjectList.append(Button(self.MainWnd, image=self.photoPredict, borderwidth=0,command=self.ButtonPredict))
+        self.MainObjectList.append(Button(self.MainWnd, image=self.photoPredict, borderwidth=0, command=self.ButtonPredict))
         self.lbl = Gif.ImageLabel(self.MainWnd)
         self.lbl.load('Photo/Hani.gif')
         self.lbr = Gif.ImageLabel(self.MainWnd)
@@ -91,6 +95,7 @@ class MainGui:
         self.MainObjectList[7].place(x=160, y=350)
         self.lbl.place(x=0, y=680)
         self.lbr.place(x=240, y=680)
+
     def SetSearchButtons(self):
         self.input_text.set("마명이나 원하는 경기 변호를 입력해주세요")
         self.ForRaceDateSelector.set("원하시면 경기 날짜 선택")
@@ -205,11 +210,12 @@ class MainGui:
                 self.nHorseButtons.clear()
                 self.nHorseList = XmlProcess.MakeNHorseList(self.ForRaceDateSelector.get(), self.input_text.get())
                 for i in range(len(self.nHorseList)):
-                    self.nHorseButtons.append(Button(self.MainWnd, text=str(i+1)+'번 경주마', padx=10, width=15, borderwidth=0, background='white', command=partial(self.SearchDef, self.nHorseList[i], "nHorse")))
-                    self.nHorseButtons[i].place(x=10, y=90+i*20)
+                    self.nHorseButtons.append(
+                        Button(self.MainWnd, text=str(i + 1) + '번 경주마', padx=10, width=15, borderwidth=0, background='white', command=partial(self.SearchDef, self.nHorseList[i], "nHorse")))
+                    self.nHorseButtons[i].place(x=10, y=90 + i * 20)
         else:
             for i in range(len(self.nHorseButtons)):
-                self.nHorseButtons[i].place(x=-200, y=90+i*20)
+                self.nHorseButtons[i].place(x=-200, y=90 + i * 20)
             self.nHorseButtons.append(Button(self.MainWnd, text="뒤로가기", command=self.BackNHorseList, borderwidth=0, background='white'))
             self.nHorseButtons[-1].place(x=20, y=340)
             ReturnResult = XmlProcess.SearchHorseProfile(InputValue)
@@ -350,7 +356,7 @@ class MainGui:
         Label(MsgTopLevel, text="내용 :").place(x=0, y=40)
         Entry(MsgTopLevel, textvariable=self.msgtext, width=20).place(x=40, y=40)
         chkBox = IntVar()
-        Checkbutton(MsgTopLevel, text="예측 보내기", variable=chkBox).place(x=00,y=60)
+        Checkbutton(MsgTopLevel, text="예측 보내기", variable=chkBox).place(x=00, y=60)
         Button(MsgTopLevel, text="발송", command=partial(self.ButtonSend, MsgTopLevel, chkBox)).place(x=150, y=60)
 
     def ButtonSend(self, TopLv, chkBox):
@@ -368,12 +374,11 @@ class MainGui:
         msgPart = MIMEText(self.msgtext.get(), 'plain')
         msg.attach(msgPart)
 
-        if chkBox :
-            infile = open("testTXT.txt" , "r", encoding='utf-8')
+        if chkBox:
+            infile = open("testTXT.txt", "r", encoding='utf-8')
             SndTXT = infile.read()
-            msgPredict = MIMEText(SndTXT,'plain')
+            msgPredict = MIMEText(SndTXT, 'plain')
             msg.attach(msgPredict)
-
 
         s = mysmtplib.MySMTP(host, port)
 
@@ -412,7 +417,7 @@ class MainGui:
         def send_Predict():
             infile = open("testTXT.txt", "r", encoding='utf-8')
             SndTXT = infile.read()
-            bot.sendMessage(user, text= SndTXT)
+            bot.sendMessage(user, text=SndTXT)
 
         def handle(msg):
             content_type, chat_type, user = telepot.glance(msg)
@@ -426,25 +431,36 @@ class MainGui:
                 region = args[1]
                 data = str(args[2])
                 HorseInfo = XmlProcess.SearchHorseProfile(data, region)
-                msgInfo = "생년월일:" + HorseInfo[0][0] + "\n통산착순상금:" + HorseInfo[0][1] +"\n이름:" + HorseInfo[0][2] + "\n마번:" + HorseInfo[0][3] + "\n출생지:" + HorseInfo[0][4] + "\n등급:" + HorseInfo[0][5] + "\n레이팅:" + HorseInfo[0][6] + "\n1년1착횟수:" + HorseInfo[0][7] + "\n2년1착횟수:" + HorseInfo[0][8] + "\n3년1착횟수:" + HorseInfo[0][9] +"\n성별:" + HorseInfo[0][10] +  "\n조교사:" + HorseInfo[0][11] + "\n조교사번호:" + HorseInfo[0][12]
+                msgInfo = "생년월일:" + HorseInfo[0][0] + "\n통산착순상금:" + HorseInfo[0][1] + "\n이름:" + HorseInfo[0][2] + \
+                          "\n마번:" + HorseInfo[0][3] + "\n출생지:" + HorseInfo[0][4] + "\n등급:" + HorseInfo[0][5] + \
+                          "\n레이팅:" + HorseInfo[0][6] + "\n1년1착횟수:" + HorseInfo[0][7] + "\n2년1착횟수:" + HorseInfo[0][8] + \
+                          "\n3년1착횟수:" + HorseInfo[0][9] + "\n성별:" + HorseInfo[0][10] + "\n조교사:" + \
+                          HorseInfo[0][11] + "\n조교사번호:" + HorseInfo[0][12]
                 sendMessage(user, msgInfo)
 
-            elif text.startswith('즐찾') :
+            elif text.startswith('즐찾'):
                 with open('bookmark', 'rb') as f:
                     lst = pickle.load(f)
                 for i in lst:
                     sendMessage(user, i)
-            elif text.startswith('예측') :
+            elif text.startswith('예측'):
                 send_Predict()
             else:
                 sendMessage(user, '모르는 명령어입니다.\n 마명 [장소] [말이름], 예측 중 하나의 명령어를 입력하세요')
 
         bot.message_loop(handle)
 
-        pass
-
     def ButtonPredict(self):
-        pass
+        Result = XmlProcess.TakeListToPredict()
+        PredictDate = XmlProcess.ForPredictDate()
+        PrdictRounds = XmlProcess.TakeRounds(PredictDate)
+        NumList = Result[0]
+        PredictResult = Result[1]
+
+        for i in range(len(NumList)):
+            NumList[i] = NumList[i][0]
+
+        print(PredictDate, PrdictRounds)
 
 
 if __name__ == '__main__':

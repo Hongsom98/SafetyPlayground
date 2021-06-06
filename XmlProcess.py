@@ -1,11 +1,11 @@
 import urllib
 import http.client
 from urllib.request import urlopen
-
 import pandas as pd
 from bs4 import BeautifulSoup
 from html_table_parser import parser_functions as parser
 from xml.etree import ElementTree
+import RandomForest
 
 SearchLegion = None
 ServiceKey = "s523%2FmgXSIIE%2B6eS%2By64bcqPxeQv19uqkY3JBSbCjg%2F%2Bob66pyHuaR5qW5uEspagQYQqTVXZfuTg%2B%2BD91g84UA%3D%3D"
@@ -42,19 +42,6 @@ def MakeNHorseList(rcDate, rcRound):
     for i in range(len(p)):
         p[i] = p[i][2]
     return p
-
-def SearchHorseProfile(InputHorseName):
-    FrontUrl = "/B551015/API8/raceHorseInfo?ServiceKey="
-    conn = http.client.HTTPConnection(DataPotal)
-    HorseName = urllib.parse.quote(InputHorseName)
-
-    conn.request("GET", FrontUrl+ServiceKey+"&pageNo=1&numOfRows=10&hr_name="+HorseName+"&meet="+SearchLegion)
-    req = conn.getresponse()
-
-    if int(req.status) == 200:
-        return ExtractData(req.read())
-    else:
-        print("Xml DownLoad Error")
 
 def SearchHorseProfile(InputHorseName, region):
     if region == "서울":
@@ -140,24 +127,26 @@ def ForPredictDate():
         today = str(int(today)+1)
 
 def TakeListToPredict():
+    RandomForest.Predict()
+
     DateToPredict = ForPredictDate()
     CharToDelete = "/()토일"
     for x in range(len(CharToDelete)):
         DateToPredict = DateToPredict.replace(CharToDelete[x], "")
 
     ToPredictSet = TakeDataToPredict(DateToPredict)
-    for i in range(len(ToPredictSet)):
-        if ToPredictSet[i][1] == '거':
-            ToPredictSet[i][1] = 'C'
-        elif ToPredictSet[i][1] == '수':
-            ToPredictSet[i][1] = 'M'
-        elif ToPredictSet[i][1] == '암':
-            ToPredictSet[i][1] = 'F'
 
     import GetLucky
 
-    print(GetLucky.GetLuckyNumber(int(ToPredictSet[0][0]), ToPredictSet[0][1], int(ToPredictSet[0][2])))
+    PredictedSet = []
+    for i in ToPredictSet:
+        PredictedSet.append(GetLucky.GetLuckyNumber(int(i[0]), int(i[1])))
+    import os
+    os.remove('PredictSet.txt')
 
+
+
+    return [ToPredictSet, PredictedSet]
 
 def TakeDataToPredict(DateToPredict):
     pgCnt = 1
@@ -179,10 +168,28 @@ def TakeDataToPredict(DateToPredict):
             continue
 
         for i in p:
-            WillPredict.append([i[0], i[5], i[6]])
+            WillPredict.append([i[0], i[6]])
         pgCnt += 1
 
     return WillPredict
 
+def TakeRounds(DateToPredict):
+    pgCnt = 1
+    Return = []
+    while True:
+        if pgCnt > 15:
+            break
 
-TakeListToPredict()
+        url = "https://race.kra.co.kr/chulmainfo/registStateRegistList.do?meet=1&date=" + DateToPredict + "&pgNo=" + str(pgCnt)
+        result = urlopen(url)
+        html = result.read()
+        soup = BeautifulSoup(html, 'html.parser')
+        temp = soup.find_all("table")
+        p = parser.make2d(temp[2])
+        del p[0]
+
+        if p[0][0] != "자료가 없습니다.":
+            Return.append(pgCnt)
+        pgCnt += 1
+
+    return Return

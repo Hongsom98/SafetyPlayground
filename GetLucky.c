@@ -4,28 +4,21 @@ static PyObject*
 GetLuckyNumber(PyObject* self, PyObject* args)
 {
     int inum, iage;
-    const char* istr;
 
-    if (!PyArg_ParseTuple(args, "isi", &inum, &istr, &iage))
+    if (!PyArg_ParseTuple(args, "ii", &inum, &iage))
         return NULL;
 
     FILE* fp = NULL;
     fopen_s(&fp, "PredictSet.txt", "r");
     if (fp == NULL) return 0;
 
-    int top1, top2, top3;
-    int age, num;
-    char sex;
-    fscanf_s(fp, "%d %d %d %d %d %c \n", &top1, &top2, &top3, &age, &num, &sex);
-    fclose(fp);
-    return Py_BuildValue("iiC", age, num, sex);
-    /*int numval=0, ageval=0, sexval=0;
+    int numval=0, ageval=0;
     while (!feof(fp)) {
         int top1, top2, top3;
         int age, num;
         char* sex = NULL;
 
-        fscanf(fp, "%d %d %d %d %d %s \n", &top1, &top2, &top3, &age, &num, sex);
+        fscanf(fp, "%d %d %d %d %d \n", &top1, &top2, &top3, &age, &num);
 
         if (inum == num) {
             numval += top1 + top2 + top3;
@@ -33,14 +26,10 @@ GetLuckyNumber(PyObject* self, PyObject* args)
         if (iage == age) {
             ageval += top1 + top2 + top3;
         }
-        if (!strcmp(istr, sex)) {
-            sexval += top1 + top2 + top3;
-        }
-        return Py_BuildValue("[i,i,s]", age, num, sex);
     }
     fclose(fp);
-    
-    return Py_BuildValue("[i,i,i]", numval, ageval, sexval);*/
+    int returnval = numval + ageval;
+    return Py_BuildValue("i", returnval);
 }
 
 static PyMethodDef GetLuckyMethods[] = {

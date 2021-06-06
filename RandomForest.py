@@ -30,37 +30,14 @@ def Predict():
     d['Age'] = temp
 
     temp = []
-    for i in X_test['Cutted']:
-        temp.append(i)
-    d['Cutted'] = temp
-
-    temp = []
-    for i in X_test['Male']:
-        temp.append(i)
-    d['Male'] = temp
-
-    temp = []
-    for i in X_test['Female']:
-        temp.append(i)
-    d['Female'] = temp
-
-    temp = []
     for i in X_test['HorseNum']:
         temp.append(i)
     d["HorseNum"] = temp
-
 
     PredictList = []
 
     for i in range(len(d)):
         temp = list(d.loc[i])
-        if temp[4]:
-            temp.append("C")
-        elif temp[5]:
-            temp.append("M")
-        elif temp[6]:
-            temp.append("F")
-        del temp[4:7]
         PredictList.append(temp)
 
     with open('PredictSet.txt', 'w') as f:
@@ -69,4 +46,3 @@ def Predict():
                 f.write(str(i)+" ")
             f.write('\n')
 
-Predict()
