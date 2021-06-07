@@ -384,7 +384,7 @@ class MainGui:
         msg.attach(msgPart)
 
         if chkBox:
-            infile = open("testTXT.txt", "r", encoding='utf-8')
+            infile = open("LuckyNums.txt", "r", encoding='cp949')
             SndTXT = infile.read()
             msgPredict = MIMEText(SndTXT, 'plain')
             msg.attach(msgPredict)
@@ -404,18 +404,6 @@ class MainGui:
         bot = telepot.Bot('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
         updater = Updater('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
 
-        user = None
-        msg = '안녕하세요 영인이네 안전놀이터입니다\n'
-        msg += '''경기 일★정 조회
-
-§§경주마 정보/성적 조회§§
-
-♜경기 영상 링크♜
-
-관심 경주마 저장/관련 정보 연동
-
-※다음 경기 예측 무료 제공￥
-'''
 
         def sendMessage(user, msg):
             try:
@@ -424,10 +412,10 @@ class MainGui:
                 traceback.print_exc(file=sys.stdout)
 
         def send_Predict(user):
-            infile = open("LuckyNums.txt", "r", encoding='utf-8')
+            infile = open("LuckyNums.txt", "r", encoding='cp949')
             if infile == None:
                 self.ButtonPredict()
-                infile = open("LuckyNums.txt", "r", encoding='utf-8')
+                infile = open("LuckyNums.txt", "r", encoding='cp949')
             SndTXT = infile.read()
             sendMessage(user, SndTXT)
             os.remove("LuckyNums.txt")
@@ -464,8 +452,21 @@ class MainGui:
                     sendMessage(user, msg)
             elif text.startswith('예측'):
                 send_Predict(user)
+            elif text.startswith('하이'):
+                msg = '안녕하세요 영인이네 안전놀이터입니다\n'
+                msg += '''경기 일★정 조회
+
+                §§경주마 정보/성적 조회§§
+
+                ♜경기 영상 링크♜
+
+                관심 경주마 저장/관련 정보 연동
+
+                ※다음 경기 예측 무료 제공￥
+                '''
+                sendMessage(user,msg)
             else:
-                sendMessage(user, '모르는 명령어입니다.\n 마명 [장소] [말이름], 예측 중 하나의 명령어를 입력하세요')
+                sendMessage(user, '모르는 명령어입니다.\n 마명 [장소] [말이름], 예측,즐찾 중 하나의 명령어를 입력하세요')
 
         bot.message_loop(handle)
 
