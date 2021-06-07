@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from html_table_parser import parser_functions as parser
 from xml.etree import ElementTree
 import RandomForest
+from multipledispatch import dispatch
 
 SearchLegion = None
 ServiceKey = "s523%2FmgXSIIE%2B6eS%2By64bcqPxeQv19uqkY3JBSbCjg%2F%2Bob66pyHuaR5qW5uEspagQYQqTVXZfuTg%2B%2BD91g84UA%3D%3D"
@@ -43,6 +44,21 @@ def MakeNHorseList(rcDate, rcRound):
         p[i] = p[i][2]
     return p
 
+@dispatch(str)
+def SearchHorseProfile(InputHorseName):
+    FrontUrl = "/B551015/API8/raceHorseInfo?ServiceKey="
+    conn = http.client.HTTPConnection(DataPotal)
+    HorseName = urllib.parse.quote(InputHorseName)
+
+    conn.request("GET", FrontUrl + ServiceKey + "&pageNo=1&numOfRows=10&hr_name=" + HorseName + "&meet=" + SearchLegion)
+    req = conn.getresponse()
+
+    if int(req.status) == 200:
+        return ExtractData(req.read())
+    else:
+        print("Xml DownLoad Error")
+
+@dispatch(str, str)
 def SearchHorseProfile(InputHorseName, region):
     if region == "서울":
         SearchLegion = "1"

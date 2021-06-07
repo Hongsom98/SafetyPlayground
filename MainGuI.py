@@ -16,6 +16,7 @@ import Gif
 import telepot
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
+import os
 
 # -*- coding:utf-8 -*-
 
@@ -27,6 +28,14 @@ HorseInfoForSave = None
 def Button_Namuwiki_Link():
     webbrowser.open("https://namu.wiki/w/%EA%B2%BD%EB%A7%88")
 
+
+def FindLuckyNumIndexes(PredictResult):
+    temp = PredictResult
+    returnlist = []
+    for i in range(4):
+        returnlist.append(temp.index(max(temp)))
+        del temp[temp.index(max(temp))]
+    return list(set(returnlist))
 
 class MainGui:
     def __init__(self):
@@ -415,9 +424,13 @@ class MainGui:
                 traceback.print_exc(file=sys.stdout)
 
         def send_Predict(user):
-            infile = open("testTXT.txt", "r", encoding='utf-8')
+            infile = open("LuckyNums.txt", "r", encoding='utf-8')
+            if infile == None:
+                self.ButtonPredict()
+                infile = open("LuckyNums.txt", "r", encoding='utf-8')
             SndTXT = infile.read()
             sendMessage(user, SndTXT)
+            os.remove("LuckyNums.txt")
 
         def handle(msg):
             content_type, chat_type, user = telepot.glance(msg)
@@ -444,10 +457,10 @@ class MainGui:
 
                 for i in lst:
                     msg = "생년월일:" + i[0] + "\n통산착순상금:" + i[1] + "\n이름:" + i[2] + \
-                              "\n마번:" + i[3] + "\n출생지:" + i[4] + "\n등급:" + i[5] + \
-                              "\n레이팅:" + i[6] + "\n1년1착횟수:" + i[7] + "\n2년1착횟수:" + i[8] + \
-                              "\n3년1착횟수:" + i[9] + "\n성별:" + i[10] + "\n조교사:" + \
-                              i[11] + "\n조교사번호:" + i[12]
+                          "\n마번:" + i[3] + "\n출생지:" + i[4] + "\n등급:" + i[5] + \
+                          "\n레이팅:" + i[6] + "\n1년1착횟수:" + i[7] + "\n2년1착횟수:" + i[8] + \
+                          "\n3년1착횟수:" + i[9] + "\n성별:" + i[10] + "\n조교사:" + \
+                          i[11] + "\n조교사번호:" + i[12]
                     sendMessage(user, msg)
             elif text.startswith('예측'):
                 send_Predict(user)
@@ -459,14 +472,42 @@ class MainGui:
     def ButtonPredict(self):
         Result = XmlProcess.TakeListToPredict()
         PredictDate = XmlProcess.ForPredictDate()
-        PrdictRounds = XmlProcess.TakeRounds(PredictDate)
+        PredictRounds = XmlProcess.TakeRounds(PredictDate)
         NumList = Result[0]
         PredictResult = Result[1]
 
         for i in range(len(NumList)):
-            NumList[i] = NumList[i][0]
+            NumList[i] = int(NumList[i][0])
 
-        print(PredictDate, PrdictRounds)
+        idx_list = [idx for idx, val in enumerate(NumList) if val == 1]
+        size = len(NumList)
+        res = [NumList[i: j] for i, j in zip([0] + idx_list, idx_list + ([size] if idx_list[-1] != size else []))]
+        del res[0]
+
+        res2 = []
+        for i in res:
+            res2.append(PredictResult[0:len(i)])
+            del PredictResult[0:len(i)]
+
+        topWnd = Toplevel(self.MainWnd)
+        topWnd.geometry("320x350+720+450")
+
+        ForSave = []
+        for i in range(len(PredictRounds)):
+            Label(topWnd, text=str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는").pack()
+            indexes = FindLuckyNumIndexes(res2[i])
+            luckynums = ""
+            for j in indexes:
+                luckynums += str(res[0][j]) + " "
+            Label(topWnd, text=luckynums + '\n').pack()
+            ForSave.append([str(str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는"), luckynums])
+
+        topWnd.title("예측 결과")
+
+        with open('LuckyNums.txt', 'w') as f:
+            for item in ForSave:
+                for i in item:
+                    f.write(i + "\n")
 
 
 if __name__ == '__main__':
