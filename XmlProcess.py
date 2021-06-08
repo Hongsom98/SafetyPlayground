@@ -8,6 +8,8 @@ from xml.etree import ElementTree
 import RandomForest
 from multipledispatch import dispatch
 import os
+import GetLucky
+
 
 SearchLegion = None
 ServiceKey = "s523%2FmgXSIIE%2B6eS%2By64bcqPxeQv19uqkY3JBSbCjg%2F%2Bob66pyHuaR5qW5uEspagQYQqTVXZfuTg%2B%2BD91g84UA%3D%3D"
@@ -138,8 +140,6 @@ def TakeListToPredict():
         DateToPredict = DateToPredict.replace(CharToDelete[x], "")
 
     ToPredictSet = TakeDataToPredict(DateToPredict)
-
-    import GetLucky
 
     PredictedSet = []
     for i in ToPredictSet:
