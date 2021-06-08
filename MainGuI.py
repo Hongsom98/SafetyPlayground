@@ -37,6 +37,7 @@ def FindLuckyNumIndexes(PredictResult):
         del temp[temp.index(max(temp))]
     return list(set(returnlist))
 
+
 class MainGui:
     def __init__(self):
         self.MainWnd = Tk()
@@ -73,6 +74,8 @@ class MainGui:
         self.HorsePicture = None
         self.nHorseList = None
         self.nHorseButtons = []
+        self.lbl = None
+        self.lbr = None
 
         self.MainSceneButtons()
         self.MainWnd.mainloop()
@@ -115,7 +118,7 @@ class MainGui:
         self.SearchObjectsList.append(Button(self.MainWnd, image=self.photoBack, command=self.TurnToMainScene, width=50, height=45))  # 뒤로가기 4
         self.SearchObjectsList.append(Button(self.MainWnd, textvariable=self.ForRaceDateSelector, width=40, height=1, command=self.RaceDateSelector))  # 달력 5
         self.Datacanvas = Canvas(self.MainWnd, bg='white', width=150, height=300)
-        self.Graphcanvas = Canvas(self.MainWnd, bg='white', width=450, height=270)
+        self.Graphcanvas = Canvas(self.MainWnd, bg='white', width=460, height=270)
 
         self.SearchObjectsPlace()
 
@@ -155,9 +158,7 @@ class MainGui:
         try:
             with open('bookmark', 'rb') as f:
                 self.FavList = pickle.load(f)
-                print("성공")
         except:
-            print("실패")
             pass
 
     def Favorite(self):
@@ -167,10 +168,12 @@ class MainGui:
 
         self.SearchObjectsList[3].destroy()
         if HorseInfoForSave in self.FavList:
-            self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=50)
+            self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50,
+                                               height=50)
             self.FavList.remove(HorseInfoForSave)
         else:
-            self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite, width=50, height=50)
+            self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite,
+                                               width=50, height=50)
             self.FavList.append(HorseInfoForSave)
         with open('bookmark', 'wb') as f:
             pickle.dump(self.FavList, f)
@@ -200,9 +203,11 @@ class MainGui:
 
                 self.SearchObjectsList[3].destroy()
                 if HorseInfoForSave in self.FavList:
-                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite, width=50, height=50)
+                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoYellowStar, command=self.Favorite,
+                                                       width=50, height=50)
                 else:
-                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite, width=50, height=50)
+                    self.SearchObjectsList[3] = Button(self.MainWnd, image=self.photoWhiteStar, command=self.Favorite,
+                                                       width=50, height=50)
                 self.SearchObjectsList[3].place(x=360, y=10)
 
                 self.PrintHorseInfo(HorseInfo)
@@ -220,12 +225,14 @@ class MainGui:
                 self.nHorseList = XmlProcess.MakeNHorseList(self.ForRaceDateSelector.get(), self.input_text.get())
                 for i in range(len(self.nHorseList)):
                     self.nHorseButtons.append(
-                        Button(self.MainWnd, text=str(i + 1) + '번 경주마', padx=10, width=15, borderwidth=0, background='white', command=partial(self.SearchDef, self.nHorseList[i], "nHorse")))
+                        Button(self.MainWnd, text=str(i + 1) + '번 경주마', padx=10, width=15, borderwidth=0,
+                               background='white', command=partial(self.SearchDef, self.nHorseList[i], "nHorse")))
                     self.nHorseButtons[i].place(x=10, y=90 + i * 20)
         else:
             for i in range(len(self.nHorseButtons)):
                 self.nHorseButtons[i].place(x=-200, y=90 + i * 20)
-            self.nHorseButtons.append(Button(self.MainWnd, text="뒤로가기", command=self.BackNHorseList, borderwidth=0, background='white'))
+            self.nHorseButtons.append(
+                Button(self.MainWnd, text="뒤로가기", command=self.BackNHorseList, borderwidth=0, background='white'))
             self.nHorseButtons[-1].place(x=20, y=340)
             ReturnResult = XmlProcess.SearchHorseProfile(InputValue)
             HorseInfo = ReturnResult[0]
@@ -279,7 +286,8 @@ class MainGui:
             with urllib.request.urlopen(url) as u:
                 raw_data = u.read()
         except:
-            with urllib.request.urlopen("https://studbook.kra.co.kr/servlet/ImageResizer?file=/h_photo/040/040827-l.JPG&width=210&height=142") as u:
+            with urllib.request.urlopen(
+                    "https://studbook.kra.co.kr/servlet/ImageResizer?file=/h_photo/040/040827-l.JPG&width=210&height=142") as u:
                 raw_data = u.read()
 
         im = Image.open(BytesIO(raw_data))
@@ -309,7 +317,8 @@ class MainGui:
             y1 = 270 - y_gap
             self.Graphcanvas.create_rectangle(x0, y0, x1, y1, fill="#020721", outline='yellow')
             self.Graphcanvas.create_text(x0 + 7, y0, anchor=SW, text=str(i) + "등")
-            self.RaceDateButtonList.append(Button(self.MainWnd, text=RaceDate[x], borderwidth=0, background='white', command=partial(self.ShowRaceVideo, RaceDate[x], RaceRound[x])))
+            self.RaceDateButtonList.append(Button(self.MainWnd, text=RaceDate[x], borderwidth=0, background='white',
+                                                  command=partial(self.ShowRaceVideo, RaceDate[x], RaceRound[x])))
             self.RaceDateButtonList[x].place(x=x0 - 2, y=y1 + 400)
 
     def TurnToSearchScene(self):
@@ -349,8 +358,6 @@ class MainGui:
         MsgTopLevel.geometry("200x100")
         MsgTopLevel.title("메일 보내기")
 
-        # html = ""
-
         self.MsgTitle = StringVar()
 
         self.recipientAddr = StringVar()
@@ -385,7 +392,11 @@ class MainGui:
 
         if chkBox:
             infile = open("LuckyNums.txt", "r", encoding='cp949')
+            if infile is None:
+                self.ButtonPredict()
+                infile = open("LuckyNums.txt", "r", encoding='cp949')
             SndTXT = infile.read()
+            infile.close()
             msgPredict = MIMEText(SndTXT, 'plain')
             msg.attach(msgPredict)
 
@@ -397,13 +408,12 @@ class MainGui:
         s.login(self.senderAddress, self.passwd)
         s.sendmail(self.senderAddress, [self.recipientAddr.get()], msg.as_string())
         s.close()
+        os.remove("LuckyNums.txt")
         TopLv.destroy()
 
     def ButtonTelegramSend(self):
 
         bot = telepot.Bot('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
-        updater = Updater('1834221680:AAGmsL3Wb3uYq2jGPY2tLGXDbKR22_R8OfU')
-
 
         def sendMessage(user, msg):
             try:
@@ -413,12 +423,13 @@ class MainGui:
 
         def send_Predict(user):
             infile = open("LuckyNums.txt", "r", encoding='cp949')
-            if infile == None:
+            if infile is None:
                 self.ButtonPredict()
                 infile = open("LuckyNums.txt", "r", encoding='cp949')
             SndTXT = infile.read()
-            sendMessage(user, SndTXT)
+            infile.close()
             os.remove("LuckyNums.txt")
+            sendMessage(user, SndTXT)
 
         def handle(msg):
             content_type, chat_type, user = telepot.glance(msg)
@@ -464,7 +475,7 @@ class MainGui:
 
                 ※다음 경기 예측 무료 제공￥
                 '''
-                sendMessage(user,msg)
+                sendMessage(user, msg)
             else:
                 sendMessage(user, '모르는 명령어입니다.\n 마명 [장소] [말이름], 예측,즐찾 중 하나의 명령어를 입력하세요')
 
@@ -495,13 +506,16 @@ class MainGui:
 
         ForSave = []
         for i in range(len(PredictRounds)):
-            Label(topWnd, text=str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는").pack()
+            Label(topWnd,
+                  text=str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(
+                      PredictRounds[i]) + "경기의 행운의 숫자는").pack()
             indexes = FindLuckyNumIndexes(res2[i])
             luckynums = ""
             for j in indexes:
                 luckynums += str(res[0][j]) + " "
             Label(topWnd, text=luckynums + '\n').pack()
-            ForSave.append([str(str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는"), luckynums])
+            ForSave.append([str(str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(
+                PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는"), luckynums])
 
         topWnd.title("예측 결과")
 

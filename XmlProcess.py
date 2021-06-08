@@ -7,13 +7,12 @@ from html_table_parser import parser_functions as parser
 from xml.etree import ElementTree
 import RandomForest
 from multipledispatch import dispatch
+import os
 
 SearchLegion = None
 ServiceKey = "s523%2FmgXSIIE%2B6eS%2By64bcqPxeQv19uqkY3JBSbCjg%2F%2Bob66pyHuaR5qW5uEspagQYQqTVXZfuTg%2B%2BD91g84UA%3D%3D"
 DataPotal = "apis.data.go.kr"
 
-def InitSettings():
-    pass
 
 def DoSearchWithRaceRound(InputDate):
     Fronturl = "/B551015/API26/entrySheet?serviceKey="
@@ -60,6 +59,7 @@ def SearchHorseProfile(InputHorseName):
 
 @dispatch(str, str)
 def SearchHorseProfile(InputHorseName, region):
+    global SearchLegion
     if region == "서울":
         SearchLegion = "1"
     elif region == "부경":
@@ -100,7 +100,6 @@ def ExtractData(XmlStr):
     ItemInElements = Tree.iter("item")
 
     Result = []
-
     for item in ItemInElements:
         Result.append(item.find("birthday").text)
         Result.append(item.find("chaksunT").text)
@@ -121,21 +120,9 @@ def ExtractData(XmlStr):
     return [Result, raceList]
 
 def ForPredictDate():
-    """
-    url = "https://race.kra.co.kr/chulmainfo/RegistStateList.do?Act=02&Sub=6&meet=1"
-    result = urlopen(url)
-    html = result.read()
-    soup = BeautifulSoup(html, "html.parser")
-    tables = soup.find_all('table')
-    p = parser.make2d(tables[0])
-    del p[0]
-    return p[-1][1]
-    """
-
     import datetime
 
     today = datetime.datetime.now().strftime("%Y%m%d")
-
     while True:
         temp = pd.Timestamp(today).day_name()
         if temp == "Saturday" or temp == "Sunday":
@@ -157,11 +144,7 @@ def TakeListToPredict():
     PredictedSet = []
     for i in ToPredictSet:
         PredictedSet.append(GetLucky.GetLuckyNumber(int(i[0]), int(i[1])))
-    import os
     os.remove('PredictSet.txt')
-
-
-
     return [ToPredictSet, PredictedSet]
 
 def TakeDataToPredict(DateToPredict):
