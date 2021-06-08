@@ -162,12 +162,9 @@ def TakeDataToPredict(DateToPredict):
         p = parser.make2d(temp[2])
         del p[0]
 
-        if p[0][0] == "자료가 없습니다.":
-            pgCnt += 1
-            continue
-
-        for i in p:
-            WillPredict.append([i[0], i[6]])
+        if p[0][0] != "자료가 없습니다.":
+            for i in p:
+                WillPredict.append([i[0], i[6]])
         pgCnt += 1
 
     return WillPredict

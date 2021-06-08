@@ -506,16 +506,15 @@ class MainGui:
 
         ForSave = []
         for i in range(len(PredictRounds)):
-            Label(topWnd,
-                  text=str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(
-                      PredictRounds[i]) + "경기의 행운의 숫자는").pack()
+            Label(topWnd, text=str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는").pack()
             indexes = FindLuckyNumIndexes(res2[i])
             luckynums = ""
             for j in indexes:
                 luckynums += str(res[0][j]) + " "
+
             Label(topWnd, text=luckynums + '\n').pack()
-            ForSave.append([str(str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(
-                PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는"), luckynums])
+
+            ForSave.append([str(str(PredictDate[0:4]) + "년 " + str(PredictDate[4:6]) + "월 " + str(PredictDate[6:]) + "일 제" + str(PredictRounds[i]) + "경기의 행운의 숫자는"), luckynums])
 
         topWnd.title("예측 결과")
 
