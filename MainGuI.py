@@ -331,9 +331,16 @@ class MainGui:
     def TurnToMainScene(self):
         for i in range(len(self.SearchObjectsList)):
             self.SearchObjectsList[i].destroy()
+        for i in range(len(self.nHorseButtons)):
+            self.nHorseButtons[i].destroy()
+        for i in range(len(self.RaceDateButtonList)):
+            self.RaceDateButtonList[i].destroy()
+        self.RaceDateButtonList.clear()
         self.SearchObjectsList.clear()
+        self.nHorseButtons.clear()
         self.Graphcanvas.destroy()
         self.Datacanvas.destroy()
+        self.HorsePicture.destroy()
 
         self.MainSceneButtons()
 
